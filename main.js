@@ -44,8 +44,6 @@ function gameSetup() {
     app.stage.addChild(sprite);
 
 
-
-
     // [row][col]
     const boardContainer = new PIXI.Container();
     app.stage.addChild(boardContainer);
@@ -70,15 +68,6 @@ function gameSetup() {
     boardContainer.removeChild(board[0][0]);
     board[0][0] = PIXI.Sprite.from("assets/tiles/NE.png");
     boardContainer.addChild(board[0][0]);
-
-
-    // GAME BOARD CURSOR ("SELECT")
-    let select = PIXI.Sprite.from("assets/objects/SELECT.png");
-    select.x = boardX;
-    select.y = boardY;
-    app.stage.addChild(select);
-
-
 
 
 
@@ -170,16 +159,22 @@ function gameSetup() {
             }
         } while (duplicate);
 
-        carrots[i] = PIXI.Sprite.from("assets/objects/carrot.jpg");
+        carrots[i] = PIXI.Sprite.from("assets/objects/carrot.png");
         carrots[i].x = xtemp * 80 + 20;
         carrots[i].y = ytemp * 80 + 20;
         carrotContainer.addChild(carrots[i])
     }
 
 
+    // GAME BOARD CURSOR ("SELECT")
+    let select = PIXI.Sprite.from("assets/objects/SELECT.png");
+    select.x = boardX;
+    select.y = boardY;
+    app.stage.addChild(select);
+
 
     // PLAYER
-    const player = PIXI.Sprite.from("assets/objects/rabbit.jpg");
+    const player = PIXI.Sprite.from("assets/objects/rabbit.png");
     app.stage.addChild(player);
 
     let playerX = 0;
