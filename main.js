@@ -1,52 +1,61 @@
-const EMPTY = PIXI.Texture.from('assets/tiles/EMPTY.png');
-const NW = PIXI.Texture.from('assets/tiles/NW.png');
-const SW = PIXI.Texture.from('assets/tiles/SW.png');
-const SE = PIXI.Texture.from('assets/tiles/SE.png');
-const NE = PIXI.Texture.from('assets/tiles/NE.png');
-const NS = PIXI.Texture.from('assets/tiles/NS.png');
-const WE = PIXI.Texture.from('assets/tiles/WE.png');
-
-const BACKGROUND = PIXI.Texture.from('assets/scene/BACKGROUND.jpeg');
-
-const boardWidth = 8;
-const boardHeight = 10;
+const boardWidth = 6;
+const boardHeight = 8;
 const boardX = 200;
 const boardY = 100;
 
 const queueX = 60;
 const queueY = 150;
 
-/*PIXI.Loader.shared
-    .add(["assets/tiles/EMPTY.png",
-        "assets/tiles/NW.png",
-        "assets/tiles/SW.png",
-        "assets/tiles/SE.png",
-        "assets/tiles/NE.png",
-        "assets/tiles/NS.png",
-        "assets/tiles/WE.png",
-        "assets/scene/BACKGROUND.jpeg"
-    ])
-    .load(setup);*/
-
-gameSetup();
 
 
-function gameSetup() {
+let app = new PIXI.Application({
+    width: window.innerWidth,
+    height: window.innerHeight
+});
 
-    // Create the application helper and add its render target to the page
-    let app = new PIXI.Application({ width: 1600, height: 1000 });
-    document.body.appendChild(app.view);
+document.body.appendChild(app.view);
 
-    // Create the sprite and add it to the stage
-    let sprite = PIXI.Sprite.from("assets/scene/BACKGROUND.jpeg");
-    sprite.width = 1600;
-    sprite.height = 1000;
-    app.stage.addChild(sprite);
+app.loader
+    .add("assets/scene/background.jpeg")
+    .add("assets/objects/bomb.png")
+    .add("assets/objects/carrot.png")
+    .add("assets/objects/rabbit.png")
+    .add("assets/objects/SELECT.png")
+    .add("assets/objects/x.png")
+    .add("assets/tiles/EMPTY.png")
+    .add("assets/tiles/NE.png")
+    .add("assets/tiles/NS.png")
+    .add("assets/tiles/NW.png")
+    .add("assets/tiles/SE.png")
+    .add("assets/tiles/SW.png")
+    .add("assets/tiles/WE.png")
+    .load(setup);
 
+function setup() {
+    let resources = app.loader.resources;
+
+    // Create the background and add it to the stage
+    let background = new PIXI.Sprite(resources["assets/scene/background.jpeg"].texture);
+    background.width = window.innerWidth;
+    background.height = window.innerHeight;
+
+    window.addEventListener('resize', resize);
+
+    // Resize function window
+    function resize() {
+        // Resize the renderer
+        app.renderer.resize(window.innerWidth, window.innerHeight);
+
+        // You can use the 'screen' property as the renderer visible
+        // area, this is more useful than view.width/height because
+        // it handles resolution
+        background.width = app.screen.width;
+        background.height = app.screen.height;
+    }
 
     // [row][col]
     const boardContainer = new PIXI.Container();
-    app.stage.addChild(boardContainer);
+
     boardContainer.x = boardX;
     boardContainer.y = boardY;
 
@@ -55,7 +64,7 @@ function gameSetup() {
     for (let row = 0; row < boardHeight; row++) {
         rowArr = [];
         for (let col = 0; col < boardWidth; col++) {
-            const spr = PIXI.Sprite.from('assets/tiles/EMPTY.png');
+            const spr = new PIXI.Sprite(resources['assets/tiles/EMPTY.png'].texture);
             spr.x = col * 80;
             spr.y = row * 80;
             boardContainer.addChild(spr);
@@ -66,7 +75,7 @@ function gameSetup() {
 
 
     boardContainer.removeChild(board[0][0]);
-    board[0][0] = PIXI.Sprite.from("assets/tiles/NE.png");
+    board[0][0] = new PIXI.Sprite(resources["assets/tiles/NE.png"].texture);
     boardContainer.addChild(board[0][0]);
 
 
@@ -75,29 +84,29 @@ function gameSetup() {
     let queueContainer = new PIXI.Container();
     queueContainer.x = queueX;
     queueContainer.y = queueY;
-    app.stage.addChild(queueContainer);
+
 
 
     let queue = [];
     for (let i = 0; i < 100; i++) {
         choice = Math.floor(Math.random() * 6);
         if (choice == 0) {
-            queue.push(PIXI.Sprite.from("assets/tiles/NE.png"));
+            queue.push(new PIXI.Sprite(resources["assets/tiles/NE.png"].texture));
         }
         else if (choice == 1) {
-            queue.push(PIXI.Sprite.from("assets/tiles/NS.png"));
+            queue.push(new PIXI.Sprite(resources["assets/tiles/NS.png"].texture));
         }
         else if (choice == 2) {
-            queue.push(PIXI.Sprite.from("assets/tiles/NW.png"));
+            queue.push(new PIXI.Sprite(resources["assets/tiles/NW.png"].texture));
         }
         else if (choice == 3) {
-            queue.push(PIXI.Sprite.from("assets/tiles/SE.png"));
+            queue.push(new PIXI.Sprite(resources["assets/tiles/SE.png"].texture));
         }
         else if (choice == 4) {
-            queue.push(PIXI.Sprite.from("assets/tiles/SW.png"));
+            queue.push(new PIXI.Sprite(resources["assets/tiles/SW.png"].texture));
         }
         else if (choice == 5) {
-            queue.push(PIXI.Sprite.from("assets/tiles/WE.png"));
+            queue.push(new PIXI.Sprite(resources["assets/tiles/WE.png"].texture));
         }
     }
 
@@ -143,142 +152,215 @@ function gameSetup() {
     let carrotContainer = new PIXI.Container();
     carrotContainer.x = boardX;
     carrotContainer.y = boardY;
-    app.stage.addChild(carrotContainer);
 
-    carrots = [];
+
+    let carrots = [];
+    for (let row = 0; row < boardHeight; row++) {
+        carrots[row] = [];
+        for (let col = 0; col < boardWidth; col++) {
+            carrots[row][col] = undefined;
+        }
+    }
     for (let i = 0; i < 15; i++) {
         do {
             var xtemp = Math.floor(Math.random() * boardWidth);
-            var ytemp = Math.floor(Math.random() * boardWidth);
+            var ytemp = Math.floor(Math.random() * boardHeight);
 
             var duplicate = false;
+
+            if (xtemp == 0 && ytemp == 0) {
+                duplicate = true;
+            }
             for (let j = 0; j < carrots.length; j++) {
-                if(carrots[j].x == xtemp && carrots[j].y == ytemp){
+                if (carrots[ytemp][xtemp] != undefined) {
                     duplicate = true;
                 }
             }
         } while (duplicate);
 
-        carrots[i] = PIXI.Sprite.from("assets/objects/carrot.png");
-        carrots[i].x = xtemp * 80 + 20;
-        carrots[i].y = ytemp * 80 + 20;
-        carrotContainer.addChild(carrots[i])
+        carrots[ytemp][xtemp] = new PIXI.Sprite(resources["assets/objects/carrot.png"].texture);
+        carrots[ytemp][xtemp].x = xtemp * 80 + 20;
+        carrots[ytemp][xtemp].y = ytemp * 80 + 20;
+        carrotContainer.addChild(carrots[ytemp][xtemp])
     }
+
+    let carrotCount = 0;
+    let carrotText = new PIXI.Text('Carrots: ' + carrotCount, { fontFamily: 'Arial', fontSize: 24, fill: 0xff1010, align: 'center' });
 
 
     // GAME BOARD CURSOR ("SELECT")
-    let select = PIXI.Sprite.from("assets/objects/SELECT.png");
+    let select = new PIXI.Sprite(resources["assets/objects/x.png"].texture);
     select.x = boardX;
     select.y = boardY;
-    app.stage.addChild(select);
+
+    let isPlaceable = false;
+    function updateSelect() {
+        let tempX = (select.x - boardX) / 80;
+        let tempY = (select.y - boardY) / 80;
+        if (isPlaceable && board[tempY][tempX]._texture.textureCacheIds[0] != "assets/tiles/EMPTY.png") {
+            isPlaceable = false;
+            select.texture = resources["assets/objects/x.png"].texture
+        }
+        else if (!isPlaceable && board[tempY][tempX]._texture.textureCacheIds[0] == "assets/tiles/EMPTY.png") {
+            isPlaceable = true;
+            select.texture = resources["assets/objects/SELECT.png"].texture
+        }
+    }
+
 
 
     // PLAYER
-    const player = PIXI.Sprite.from("assets/objects/rabbit.png");
-    app.stage.addChild(player);
+    const player = new PIXI.Sprite(resources["assets/objects/rabbit.png"].texture);
+
 
     let playerX = 0;
     let playerY = 0;
     let playerDirection = 'E';
-    let temp = playerCoords();
-    player.x = temp[0];
-    player.y = temp[1];
+    setPlayerPosition();
 
     // PLAYER FUNCTIONS
-    function playerCoords() {
-        if (playerDirection == 'E') {
-            return [boardX + 80 * playerX + 50, boardY + 80 * playerY + 20];
-        }
-        else if (playerDirection == 'N') {
-            return [boardX + 80 * playerX + 20, boardY + 80 * playerY - 10];
-        }
-        else if (playerDirection == 'W') {
-            return [boardX + 80 * playerX - 10, boardY + 80 * playerY + 20];
-        }
-        else if (playerDirection == 'S') {
-            return [boardX + 80 * playerX + 20, boardY + 80 * playerY + 50];
-        }
-        else {
-            return [0, 0];
+    function eatCarrot() {
+        if (carrots[playerY][playerX] != undefined) {
+            carrotContainer.removeChild(carrots[playerY][playerX]);
+            carrots[playerY][playerX] = undefined;
+            carrotCount++;
+            carrotText.text = 'Carrots: ' + carrotCount;
         }
     }
 
-    function updatePlayerCoords() {
+    function setPlayerPosition() {
         if (playerDirection == 'E') {
-            if (playerX + 1 < boardWidth) {
-                if (board[playerY][playerX + 1]._texture.textureCacheIds[0] == "assets/tiles/NW.png") {
-                    playerX = playerX + 1;
-                    playerDirection = 'N';
-                    updatePlayerCoords();
-                }
-                else if (board[playerY][playerX + 1]._texture.textureCacheIds[0] == "assets/tiles/SW.png") {
-                    playerX = playerX + 1;
-                    playerDirection = 'S';
-                    updatePlayerCoords();
-                }
-                else if (board[playerY][playerX + 1]._texture.textureCacheIds[0] == "assets/tiles/WE.png") {
-                    playerX = playerX + 1;
-                    playerDirection = 'E';
-                    updatePlayerCoords();
-                }
-            }
+            player.rotation = Math.PI / 2;
+            player.x = boardX + 80 * playerX + 60;
+            player.y = boardY + 80 * playerY + 20;
         }
         else if (playerDirection == 'N') {
-            if (playerY - 1 >= 0) {
-                if (board[playerY - 1][playerX]._texture.textureCacheIds[0] == "assets/tiles/SW.png") {
-                    playerY = playerY - 1;
-                    playerDirection = 'W';
-                    updatePlayerCoords();
-                }
-                else if (board[playerY - 1][playerX]._texture.textureCacheIds[0] == "assets/tiles/SE.png") {
-                    playerY = playerY - 1;
-                    playerDirection = 'E';
-                    updatePlayerCoords();
-                }
-                else if (board[playerY - 1][playerX]._texture.textureCacheIds[0] == "assets/tiles/NS.png") {
-                    playerY = playerY - 1;
-                    playerDirection = 'N';
-                    updatePlayerCoords();
-                }
-            }
+            player.rotation = 0;
+            player.x = boardX + 80 * playerX + 20;
+            player.y = boardY + 80 * playerY + 20;
         }
         else if (playerDirection == 'W') {
-            if (playerX - 1 >= 0) {
-                if (board[playerY][playerX - 1]._texture.textureCacheIds[0] == "assets/tiles/NE.png") {
-                    playerX = playerX - 1;
-                    playerDirection = 'N';
-                    updatePlayerCoords();
-                }
-                else if (board[playerY][playerX - 1]._texture.textureCacheIds[0] == "assets/tiles/SE.png") {
-                    playerX = playerX - 1;
-                    playerDirection = 'S';
-                    updatePlayerCoords();
-                }
-                else if (board[playerY][playerX - 1]._texture.textureCacheIds[0] == "assets/tiles/WE.png") {
-                    playerX = playerX - 1;
-                    playerDirection = 'W';
-                    updatePlayerCoords();
-                }
-            }
+            player.rotation = 3 * Math.PI / 2;
+            player.x = boardX + 80 * playerX + 20;
+            player.y = boardY + 80 * playerY + 60;
         }
         else if (playerDirection == 'S') {
-            if (playerY + 1 < boardHeight) {
-                if (board[playerY + 1][playerX]._texture.textureCacheIds[0] == "assets/tiles/NE.png") {
-                    playerY = playerY + 1;
-                    playerDirection = 'E';
-                    updatePlayerCoords();
+            player.rotation = Math.PI;
+            player.x = boardX + 80 * playerX + 60;
+            player.y = boardY + 80 * playerY + 60;
+        }
+    }
+
+    let isWaiting = false;
+
+    function updatePlayerCoords() {
+        if (!isWaiting) {
+            isWaiting = true;
+            setTimeout(
+                function () {
+                    isWaiting = false;
+                    if (playerDirection == 'E') {
+                        if (playerX + 1 < boardWidth) {
+                            if (board[playerY][playerX + 1]._texture.textureCacheIds[0] == "assets/tiles/NW.png") {
+                                playerX = playerX + 1;
+                                playerDirection = 'N';
+                                setPlayerPosition();
+                                eatCarrot();
+                                updatePlayerCoords();
+                            }
+                            else if (board[playerY][playerX + 1]._texture.textureCacheIds[0] == "assets/tiles/SW.png") {
+                                playerX = playerX + 1;
+                                playerDirection = 'S';
+                                setPlayerPosition();
+                                eatCarrot();
+                                updatePlayerCoords();
+                            }
+                            else if (board[playerY][playerX + 1]._texture.textureCacheIds[0] == "assets/tiles/WE.png") {
+                                playerX = playerX + 1;
+                                playerDirection = 'E';
+                                setPlayerPosition();
+                                eatCarrot();
+                                updatePlayerCoords();
+                            }
+                        }
+                    }
+                    else if (playerDirection == 'N') {
+                        if (playerY - 1 >= 0) {
+                            if (board[playerY - 1][playerX]._texture.textureCacheIds[0] == "assets/tiles/SW.png") {
+                                playerY = playerY - 1;
+                                playerDirection = 'W';
+                                setPlayerPosition();
+                                eatCarrot();
+                                updatePlayerCoords();
+                            }
+                            else if (board[playerY - 1][playerX]._texture.textureCacheIds[0] == "assets/tiles/SE.png") {
+                                playerY = playerY - 1;
+                                playerDirection = 'E';
+                                setPlayerPosition();
+                                eatCarrot();
+                                updatePlayerCoords();
+                            }
+                            else if (board[playerY - 1][playerX]._texture.textureCacheIds[0] == "assets/tiles/NS.png") {
+                                playerY = playerY - 1;
+                                playerDirection = 'N';
+                                setPlayerPosition();
+                                eatCarrot();
+                                updatePlayerCoords();
+                            }
+                        }
+                    }
+                    else if (playerDirection == 'W') {
+                        if (playerX - 1 >= 0) {
+                            if (board[playerY][playerX - 1]._texture.textureCacheIds[0] == "assets/tiles/NE.png") {
+                                playerX = playerX - 1;
+                                playerDirection = 'N';
+                                setPlayerPosition();
+                                eatCarrot();
+                                updatePlayerCoords();
+                            }
+                            else if (board[playerY][playerX - 1]._texture.textureCacheIds[0] == "assets/tiles/SE.png") {
+                                playerX = playerX - 1;
+                                playerDirection = 'S';
+                                setPlayerPosition();
+                                eatCarrot();
+                                updatePlayerCoords();
+                            }
+                            else if (board[playerY][playerX - 1]._texture.textureCacheIds[0] == "assets/tiles/WE.png") {
+                                playerX = playerX - 1;
+                                playerDirection = 'W';
+                                setPlayerPosition();
+                                eatCarrot();
+                                updatePlayerCoords();
+                            }
+                        }
+                    }
+                    else if (playerDirection == 'S') {
+                        if (playerY + 1 < boardHeight) {
+                            if (board[playerY + 1][playerX]._texture.textureCacheIds[0] == "assets/tiles/NE.png") {
+                                playerY = playerY + 1;
+                                playerDirection = 'E';
+                                setPlayerPosition();
+                                eatCarrot();
+                                updatePlayerCoords();
+                            }
+                            else if (board[playerY + 1][playerX]._texture.textureCacheIds[0] == "assets/tiles/NW.png") {
+                                playerY = playerY + 1;
+                                playerDirection = 'W';
+                                setPlayerPosition();
+                                eatCarrot();
+                                updatePlayerCoords();
+                            }
+                            else if (board[playerY + 1][playerX]._texture.textureCacheIds[0] == "assets/tiles/NS.png") {
+                                playerY = playerY + 1;
+                                playerDirection = 'S';
+                                setPlayerPosition();
+                                eatCarrot();
+                                updatePlayerCoords();
+                            }
+                        }
+                    }
                 }
-                else if (board[playerY + 1][playerX]._texture.textureCacheIds[0] == "assets/tiles/NW.png") {
-                    playerY = playerY + 1;
-                    playerDirection = 'W';
-                    updatePlayerCoords();
-                }
-                else if (board[playerY + 1][playerX]._texture.textureCacheIds[0] == "assets/tiles/NS.png") {
-                    playerY = playerY + 1;
-                    playerDirection = 'S';
-                    updatePlayerCoords();
-                }
-            }
+                , 1000);
         }
     }
 
@@ -300,24 +382,28 @@ function gameSetup() {
             if (select.y != boardY) {
                 select.y = select.y - 80;
             }
+            updateSelect();
         }
         else if (e.keyCode == '40' || e.keyCode == '83') {
             // down arrow or s
             if (select.y != boardY + boardHeight * 80 - 80) {
                 select.y = select.y + 80;
             }
+            updateSelect();
         }
         else if (e.keyCode == '37' || e.keyCode == '65') {
             // left arrow or a
             if (select.x != boardX) {
                 select.x = select.x - 80;
             }
+            updateSelect();
         }
         else if (e.keyCode == '39' || e.keyCode == '68') {
             // right arrow
             if (select.x != boardX + boardWidth * 80 - 80) {
                 select.x = select.x + 80;
             }
+            updateSelect();
         }
         else if (e.keyCode == '74') {
             // j
@@ -332,12 +418,20 @@ function gameSetup() {
                 boardContainer.addChild(board[row][col]);
 
                 updatePlayerCoords();
-                temp = playerCoords();
-                player.x = temp[0];
-                player.y = temp[1];
+                updateSelect();
             }
         }
 
     }
+
+
+    app.stage.addChild(background);
+    app.stage.addChild(boardContainer);
+    app.stage.addChild(queueContainer);
+    app.stage.addChild(carrotContainer);
+    app.stage.addChild(player);
+    app.stage.addChild(select);
+    app.stage.addChild(carrotText);
+
 }
 
