@@ -20,7 +20,7 @@ app.loader
     .add("assets/objects/bomb.png")
     .add("assets/objects/carrot.png")
     .add("assets/objects/rabbit.png")
-    .add("assets/objects/SELECT.png")
+    .add("assets/objects/select.png")
     .add("assets/objects/x.png")
     .add("assets/tiles/EMPTY.png")
     .add("assets/tiles/NE.png")
@@ -42,15 +42,22 @@ function setup() {
     window.addEventListener('resize', resize);
 
     // Resize function window
+    let isResizing = false;
     function resize() {
-        // Resize the renderer
-        app.renderer.resize(window.innerWidth, window.innerHeight);
+        if (!isResizing) {
+            isResizing = true;
+            setTimeout(function () {
+                isResizing = false;
+                // Resize the renderer
+                app.renderer.resize(window.innerWidth, window.innerHeight);
 
-        // You can use the 'screen' property as the renderer visible
-        // area, this is more useful than view.width/height because
-        // it handles resolution
-        background.width = app.screen.width;
-        background.height = app.screen.height;
+                // You can use the 'screen' property as the renderer visible
+                // area, this is more useful than view.width/height because
+                // it handles resolution
+                background.width = app.screen.width;
+                background.height = app.screen.height;
+            }, 250);
+        }
     }
 
     // [row][col]
@@ -62,7 +69,7 @@ function setup() {
     // fill board with empty tiles
     let board = [];
     for (let row = 0; row < boardHeight; row++) {
-        rowArr = [];
+        let rowArr = [];
         for (let col = 0; col < boardWidth; col++) {
             const spr = new PIXI.Sprite(resources['assets/tiles/EMPTY.png'].texture);
             spr.x = col * 80;
@@ -74,9 +81,46 @@ function setup() {
     }
 
 
-    boardContainer.removeChild(board[0][0]);
-    board[0][0] = new PIXI.Sprite(resources["assets/tiles/NE.png"].texture);
-    boardContainer.addChild(board[0][0]);
+    board[0][0].texture = resources["assets/tiles/NE.png"].texture;
+
+    function removeTile(x,y){
+        board[x][y].texture = resources["assets/tiles/EMPTY.png"].texture;
+    }
+
+
+    //bombs
+    let bombsContainer = new PIXI.Container();
+
+    bombsContainer.x = boardX;
+    bombsContainer.y = boardY;
+
+    let bombs = [];
+    for (let row = 0; row < boardHeight; row++) {
+        let rowArr = [];
+        for (let col = 0; col < boardWidth; col++) {
+            rowArr.push(undefined);
+        }
+        bombs.push(rowArr);
+    }
+
+    function addBombs(x, y) {
+        for (let row = y - 1; row <= y + 1; row++) {
+            for (let col = x - 1; col <= x + 1; col++) {
+                if (row >= 0 && row < boardHeight && col >= 0 && col < boardWidth && bombs[row][col] == undefined) {
+                    bombs[row][col] = new PIXI.Sprite(resources["assets/objects/bomb.png"].texture);
+                    bombs[row][col].x = 80 * col + 20;
+                    bombs[row][col].y = 80 * row + 20;
+                    console.log(bombs[row][col])
+                    bombsContainer.addChild(bombs[row][col]);
+                    setTimeout(function(){
+                        bombsContainer.removeChild(bombs[row][col]);
+                        bombs[row][col] = undefined;
+                        removeTile(row, col);
+                    }, 2000);
+                }
+            }
+        }
+    }
 
 
 
@@ -203,7 +247,7 @@ function setup() {
         }
         else if (!isPlaceable && board[tempY][tempX]._texture.textureCacheIds[0] == "assets/tiles/EMPTY.png") {
             isPlaceable = true;
-            select.texture = resources["assets/objects/SELECT.png"].texture
+            select.texture = resources["assets/objects/select.png"].texture
         }
     }
 
@@ -411,15 +455,17 @@ function setup() {
             col = (select.x - boardX) / 80;
 
             if (board[row][col]._texture.textureCacheIds[0] == "assets/tiles/EMPTY.png") {
-                boardContainer.removeChild(board[row][col]);
-                board[row][col] = updateQueue();
-                board[row][col].x = col * 80;
-                board[row][col].y = row * 80;
-                boardContainer.addChild(board[row][col]);
+                board[row][col].texture = updateQueue().texture;
 
                 updatePlayerCoords();
                 updateSelect();
             }
+        }
+        else if (e.keyCode == '75'){
+            // k
+            row = (select.y - boardY) / 80;
+            col = (select.x - boardX) / 80;
+            addBombs(col , row);
         }
 
     }
@@ -430,6 +476,7 @@ function setup() {
     app.stage.addChild(queueContainer);
     app.stage.addChild(carrotContainer);
     app.stage.addChild(player);
+    app.stage.addChild(bombsContainer);
     app.stage.addChild(select);
     app.stage.addChild(carrotText);
 
