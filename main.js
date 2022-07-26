@@ -1,10 +1,10 @@
 const boardWidth = 6;
 const boardHeight = 8;
 const boardX = 200;
-const boardY = 150;
+const boardY = 200;
 
 const queueX = 60;
-const queueY = 150;
+const queueY = 250;
 
 const infobarX = 200;
 const infobarY = 50;
@@ -243,8 +243,6 @@ function setup() {
     }
 
     let carrotCount = 0;
-    let carrotText = new PIXI.Text('Carrots: ' + carrotCount, { fontFamily: 'Arial', fontSize: 24, fill: 0xff1010, align: 'center' });
-
 
     // GAME BOARD CURSOR ("SELECT")
     let select = new PIXI.Sprite(resources["assets/objects/x.png"].texture);
@@ -282,7 +280,7 @@ function setup() {
             carrotContainer.removeChild(carrots[playerY][playerX]);
             carrots[playerY][playerX] = undefined;
             carrotCount++;
-            carrotText.text = 'Carrots: ' + carrotCount;
+            carrotText.text = carrotCount;
         }
     }
 
@@ -312,7 +310,7 @@ function setup() {
     let isWaiting = false;
 
     function updatePlayerCoords() {
-        function overAndOver(xdiff, ydiff, newDir){
+        function overAndOver(xdiff, ydiff, newDir) {
             playerX += xdiff;
             playerY += ydiff;
             playerDirection = newDir;
@@ -329,101 +327,52 @@ function setup() {
                     if (playerDirection == 'E') {
                         if (playerX + 1 < boardWidth) {
                             if (board[playerY][playerX + 1]._texture.textureCacheIds[0] == "assets/tiles/NW.png") {
-                                //overAndOver(1, 0, 'N';)
-                                playerX = playerX + 1;
-                                playerDirection = 'N';
-                                setPlayerPosition();
-                                eatCarrot();
-                                updatePlayerCoords();
+                                overAndOver(1, 0, 'N');
                             }
                             else if (board[playerY][playerX + 1]._texture.textureCacheIds[0] == "assets/tiles/SW.png") {
-                                playerX = playerX + 1;
-                                playerDirection = 'S';
-                                setPlayerPosition();
-                                eatCarrot();
-                                updatePlayerCoords();
+                                overAndOver(1, 0, 'S');
                             }
                             else if (board[playerY][playerX + 1]._texture.textureCacheIds[0] == "assets/tiles/WE.png") {
-                                playerX = playerX + 1;
-                                playerDirection = 'E';
-                                setPlayerPosition();
-                                eatCarrot();
-                                updatePlayerCoords();
+                                overAndOver(1, 0, 'E');
                             }
                         }
                     }
                     else if (playerDirection == 'N') {
                         if (playerY - 1 >= 0) {
                             if (board[playerY - 1][playerX]._texture.textureCacheIds[0] == "assets/tiles/SW.png") {
-                                playerY = playerY - 1;
-                                playerDirection = 'W';
-                                setPlayerPosition();
-                                eatCarrot();
-                                updatePlayerCoords();
+                                overAndOver(0, -1, 'W');
                             }
                             else if (board[playerY - 1][playerX]._texture.textureCacheIds[0] == "assets/tiles/SE.png") {
-                                playerY = playerY - 1;
-                                playerDirection = 'E';
-                                setPlayerPosition();
-                                eatCarrot();
-                                updatePlayerCoords();
+                                overAndOver(0, -1, 'E');
                             }
                             else if (board[playerY - 1][playerX]._texture.textureCacheIds[0] == "assets/tiles/NS.png") {
-                                playerY = playerY - 1;
-                                playerDirection = 'N';
-                                setPlayerPosition();
-                                eatCarrot();
-                                updatePlayerCoords();
+                                overAndOver(0, -1, 'N');
                             }
                         }
                     }
                     else if (playerDirection == 'W') {
                         if (playerX - 1 >= 0) {
                             if (board[playerY][playerX - 1]._texture.textureCacheIds[0] == "assets/tiles/NE.png") {
-                                playerX = playerX - 1;
-                                playerDirection = 'N';
-                                setPlayerPosition();
-                                eatCarrot();
-                                updatePlayerCoords();
+                                overAndOver(-1, 0, 'N');
                             }
                             else if (board[playerY][playerX - 1]._texture.textureCacheIds[0] == "assets/tiles/SE.png") {
-                                playerX = playerX - 1;
-                                playerDirection = 'S';
-                                setPlayerPosition();
-                                eatCarrot();
-                                updatePlayerCoords();
+                                overAndOver(-1, 0, 'S');
                             }
                             else if (board[playerY][playerX - 1]._texture.textureCacheIds[0] == "assets/tiles/WE.png") {
-                                playerX = playerX - 1;
-                                playerDirection = 'W';
-                                setPlayerPosition();
-                                eatCarrot();
-                                updatePlayerCoords();
+                                overAndOver(-1, 0, 'W');
                             }
                         }
                     }
                     else if (playerDirection == 'S') {
                         if (playerY + 1 < boardHeight) {
                             if (board[playerY + 1][playerX]._texture.textureCacheIds[0] == "assets/tiles/NE.png") {
-                                playerY = playerY + 1;
-                                playerDirection = 'E';
-                                setPlayerPosition();
-                                eatCarrot();
-                                updatePlayerCoords();
+                                overAndOver(0, 1, 'E');
                             }
                             else if (board[playerY + 1][playerX]._texture.textureCacheIds[0] == "assets/tiles/NW.png") {
-                                playerY = playerY + 1;
-                                playerDirection = 'W';
-                                setPlayerPosition();
-                                eatCarrot();
-                                updatePlayerCoords();
+                                overAndOver(0, 1, 'W');
                             }
                             else if (board[playerY + 1][playerX]._texture.textureCacheIds[0] == "assets/tiles/NS.png") {
-                                playerY = playerY + 1;
-                                playerDirection = 'S';
-                                setPlayerPosition();
-                                eatCarrot();
-                                updatePlayerCoords();
+                                overAndOver(0, 1, 'S');
                             }
                         }
                     }
@@ -431,6 +380,23 @@ function setup() {
                 , hopSpeed);
         }
     }
+
+
+    // INFOBAR
+    let infobarContainer = new PIXI.Container();
+    infobarContainer.x = infobarX;
+    infobarContainer.y = infobarY;
+
+    let infoCarrot = new PIXI.Sprite(resources["assets/objects/carrot.png"].texture);
+    infoCarrot.width = 100;
+    infoCarrot.height = 100;
+    infobarContainer.addChild(infoCarrot);
+
+    let carrotText = new PIXI.Text(carrotCount, { fontFamily: 'Arial', fontSize: 108, fill: 0x444444, align: 'center' });
+    carrotText.x = 100;
+    infobarContainer.addChild(carrotText);
+
+
 
 
 
@@ -502,7 +468,7 @@ function setup() {
     app.stage.addChild(player);
     app.stage.addChild(bombsContainer);
     app.stage.addChild(select);
-    app.stage.addChild(carrotText);
+    app.stage.addChild(infobarContainer);
 
 }
 
