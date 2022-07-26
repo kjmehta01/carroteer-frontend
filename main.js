@@ -1,12 +1,13 @@
-const boardWidth = 6;
+const boardWidth = 10;
 const boardHeight = 8;
-const boardX = 200;
+//const boardX = 200;
 const boardY = 200;
+const boardX = window.innerWidth / 2 - (boardWidth * 80 / 2);
 
-const queueX = 60;
-const queueY = 250;
+const queueX = boardX - 140;
+const queueY = 240;
 
-const infobarX = 200;
+const infobarX = boardX;
 const infobarY = 50;
 
 const bombDuration = 2000;
@@ -60,15 +61,22 @@ function setup() {
                 // it handles resolution
                 background.width = app.screen.width;
                 background.height = app.screen.height;
+
+                boardContainer.x = window.innerWidth / 2 - (boardWidth * 80 / 2);
+                infobarContainer.x = boardContainer.x;
+                queueContainer.x = boardContainer.x - 140;
             }, 250);
         }
     }
 
-    // [row][col]
-    const boardContainer = new PIXI.Container();
 
+    //overarching board container
+    const boardContainer = new PIXI.Container();
     boardContainer.x = boardX;
     boardContainer.y = boardY;
+
+    // [row][col]
+    const tileContainer = new PIXI.Container();
 
     // fill board with empty tiles
     let board = [];
@@ -78,7 +86,7 @@ function setup() {
             const spr = new PIXI.Sprite(resources['assets/tiles/EMPTY.png'].texture);
             spr.x = col * 80;
             spr.y = row * 80;
-            boardContainer.addChild(spr);
+            tileContainer.addChild(spr);
             rowArr.push(spr);
         }
         board.push(rowArr);
@@ -94,9 +102,6 @@ function setup() {
 
     //bombs
     let bombsContainer = new PIXI.Container();
-
-    bombsContainer.x = boardX;
-    bombsContainer.y = boardY;
 
     let bombs = [];
     for (let row = 0; row < boardHeight; row++) {
@@ -208,8 +213,6 @@ function setup() {
 
     // CARROTS
     let carrotContainer = new PIXI.Container();
-    carrotContainer.x = boardX;
-    carrotContainer.y = boardY;
 
 
     let carrots = [];
@@ -246,13 +249,11 @@ function setup() {
 
     // GAME BOARD CURSOR ("SELECT")
     let select = new PIXI.Sprite(resources["assets/objects/x.png"].texture);
-    select.x = boardX;
-    select.y = boardY;
 
     let isPlaceable = false;
     function updateSelect() {
-        let tempX = (select.x - boardX) / 80;
-        let tempY = (select.y - boardY) / 80;
+        let tempX = select.x / 80;
+        let tempY = select.y / 80;
         if (isPlaceable && board[tempY][tempX]._texture.textureCacheIds[0] != "assets/tiles/EMPTY.png") {
             isPlaceable = false;
             select.texture = resources["assets/objects/x.png"].texture
@@ -287,23 +288,23 @@ function setup() {
     function setPlayerPosition() {
         if (playerDirection == 'E') {
             player.rotation = Math.PI / 2;
-            player.x = boardX + 80 * playerX + 60;
-            player.y = boardY + 80 * playerY + 20;
+            player.x = 80 * playerX + 60;
+            player.y = 80 * playerY + 20;
         }
         else if (playerDirection == 'N') {
             player.rotation = 0;
-            player.x = boardX + 80 * playerX + 20;
-            player.y = boardY + 80 * playerY + 20;
+            player.x = 80 * playerX + 20;
+            player.y = 80 * playerY + 20;
         }
         else if (playerDirection == 'W') {
             player.rotation = 3 * Math.PI / 2;
-            player.x = boardX + 80 * playerX + 20;
-            player.y = boardY + 80 * playerY + 60;
+            player.x = 80 * playerX + 20;
+            player.y = 80 * playerY + 60;
         }
         else if (playerDirection == 'S') {
             player.rotation = Math.PI;
-            player.x = boardX + 80 * playerX + 60;
-            player.y = boardY + 80 * playerY + 60;
+            player.x = 80 * playerX + 60;
+            player.y = 80 * playerY + 60;
         }
     }
 
@@ -413,36 +414,36 @@ function setup() {
 
         if (e.keyCode == '38' || e.keyCode == '87') {
             // up arrow or w
-            if (select.y != boardY) {
+            if (select.y != 0) {
                 select.y = select.y - 80;
             }
             updateSelect();
         }
         else if (e.keyCode == '40' || e.keyCode == '83') {
             // down arrow or s
-            if (select.y != boardY + boardHeight * 80 - 80) {
+            if (select.y != boardHeight * 80 - 80) {
                 select.y = select.y + 80;
             }
             updateSelect();
         }
         else if (e.keyCode == '37' || e.keyCode == '65') {
             // left arrow or a
-            if (select.x != boardX) {
+            if (select.x != 0) {
                 select.x = select.x - 80;
             }
             updateSelect();
         }
         else if (e.keyCode == '39' || e.keyCode == '68') {
             // right arrow
-            if (select.x != boardX + boardWidth * 80 - 80) {
+            if (select.x != boardWidth * 80 - 80) {
                 select.x = select.x + 80;
             }
             updateSelect();
         }
         else if (e.keyCode == '74') {
             // j
-            row = (select.y - boardY) / 80;
-            col = (select.x - boardX) / 80;
+            row = select.y / 80;
+            col = select.x / 80;
 
             if (board[row][col]._texture.textureCacheIds[0] == "assets/tiles/EMPTY.png") {
                 board[row][col].texture = updateQueue().texture;
@@ -453,21 +454,23 @@ function setup() {
         }
         else if (e.keyCode == '75') {
             // k
-            row = (select.y - boardY) / 80;
-            col = (select.x - boardX) / 80;
+            row = select.y / 80;
+            col = select.x / 80;
             addBombs(col, row);
         }
 
     }
 
+    boardContainer.addChild(tileContainer);
+    boardContainer.addChild(carrotContainer);
+    boardContainer.addChild(player);
+    boardContainer.addChild(bombsContainer);
+    boardContainer.addChild(select);
+
 
     app.stage.addChild(background);
-    app.stage.addChild(boardContainer);
     app.stage.addChild(queueContainer);
-    app.stage.addChild(carrotContainer);
-    app.stage.addChild(player);
-    app.stage.addChild(bombsContainer);
-    app.stage.addChild(select);
+    app.stage.addChild(boardContainer);
     app.stage.addChild(infobarContainer);
 
 }
