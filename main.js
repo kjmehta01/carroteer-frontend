@@ -1,12 +1,16 @@
 const boardWidth = 6;
 const boardHeight = 8;
 const boardX = 200;
-const boardY = 100;
+const boardY = 150;
 
 const queueX = 60;
 const queueY = 150;
 
+const infobarX = 200;
+const infobarY = 50;
 
+const bombDuration = 2000;
+const hopSpeed = 1000;
 
 let app = new PIXI.Application({
     width: window.innerWidth,
@@ -108,10 +112,12 @@ function setup() {
             for (let col = x - 1; col <= x + 1; col++) {
                 if (row >= 0 && row < boardHeight && col >= 0 && col < boardWidth && bombs[row][col] == undefined && !(row == 0 && col == 0)) {
                     bombs[row][col] = new PIXI.Sprite(resources["assets/objects/bomb.png"].texture);
-                    bombs[row][col].x = 80 * col + 20;
-                    bombs[row][col].y = 80 * row + 20;
-                    console.log(bombs[row][col])
+                    bombs[row][col].x = 80 * col;
+                    bombs[row][col].y = 80 * row;
+                    bombs[row][col].width = 80;
+                    bombs[row][col].height = 80;
                     bombsContainer.addChild(bombs[row][col]);
+
                     setTimeout(function () {
                         bombsContainer.removeChild(bombs[row][col]);
                         bombs[row][col] = undefined;
@@ -124,7 +130,7 @@ function setup() {
                             setPlayerPosition();
                             updatePlayerCoords();
                         }
-                    }, 2000);
+                    }, bombDuration);
                 }
             }
         }
@@ -306,6 +312,15 @@ function setup() {
     let isWaiting = false;
 
     function updatePlayerCoords() {
+        function overAndOver(xdiff, ydiff, newDir){
+            playerX += xdiff;
+            playerY += ydiff;
+            playerDirection = newDir;
+            setPlayerPosition();
+            eatCarrot();
+            updatePlayerCoords();
+        }
+
         if (!isWaiting) {
             isWaiting = true;
             setTimeout(
@@ -314,6 +329,7 @@ function setup() {
                     if (playerDirection == 'E') {
                         if (playerX + 1 < boardWidth) {
                             if (board[playerY][playerX + 1]._texture.textureCacheIds[0] == "assets/tiles/NW.png") {
+                                //overAndOver(1, 0, 'N';)
                                 playerX = playerX + 1;
                                 playerDirection = 'N';
                                 setPlayerPosition();
@@ -412,7 +428,7 @@ function setup() {
                         }
                     }
                 }
-                , 1000);
+                , hopSpeed);
         }
     }
 
