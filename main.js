@@ -83,7 +83,7 @@ function setup() {
 
     board[0][0].texture = resources["assets/tiles/NE.png"].texture;
 
-    function removeTile(x,y){
+    function removeTile(x, y) {
         board[x][y].texture = resources["assets/tiles/EMPTY.png"].texture;
     }
 
@@ -106,16 +106,24 @@ function setup() {
     function addBombs(x, y) {
         for (let row = y - 1; row <= y + 1; row++) {
             for (let col = x - 1; col <= x + 1; col++) {
-                if (row >= 0 && row < boardHeight && col >= 0 && col < boardWidth && bombs[row][col] == undefined) {
+                if (row >= 0 && row < boardHeight && col >= 0 && col < boardWidth && bombs[row][col] == undefined && !(row == 0 && col == 0)) {
                     bombs[row][col] = new PIXI.Sprite(resources["assets/objects/bomb.png"].texture);
                     bombs[row][col].x = 80 * col + 20;
                     bombs[row][col].y = 80 * row + 20;
                     console.log(bombs[row][col])
                     bombsContainer.addChild(bombs[row][col]);
-                    setTimeout(function(){
+                    setTimeout(function () {
                         bombsContainer.removeChild(bombs[row][col]);
                         bombs[row][col] = undefined;
                         removeTile(row, col);
+
+                        if (playerX == col && playerY == row) {
+                            playerX = 0;
+                            playerY = 0;
+                            playerDirection = 'E';
+                            setPlayerPosition();
+                            updatePlayerCoords();
+                        }
                     }, 2000);
                 }
             }
@@ -461,11 +469,11 @@ function setup() {
                 updateSelect();
             }
         }
-        else if (e.keyCode == '75'){
+        else if (e.keyCode == '75') {
             // k
             row = (select.y - boardY) / 80;
             col = (select.x - boardX) / 80;
-            addBombs(col , row);
+            addBombs(col, row);
         }
 
     }
