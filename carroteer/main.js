@@ -83,7 +83,7 @@ function setup() {
     for (let row = 0; row < boardHeight; row++) {
         let rowArr = [];
         for (let col = 0; col < boardWidth; col++) {
-            const spr = new PIXI.Sprite(resources['assets/tiles/EMPTY.png'].texture);
+            const spr = new PIXI.Sprite(resources["assets/tiles/EMPTY.png"].texture);
             spr.x = col * 80;
             spr.y = row * 80;
             tileContainer.addChild(spr);
