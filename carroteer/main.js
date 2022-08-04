@@ -1,4 +1,4 @@
-const boardWidth = 10;
+const boardWidth = 6;
 const boardHeight = 8;
 //const boardX = 200;
 const boardY = 200;
@@ -12,6 +12,8 @@ const infobarY = 50;
 
 const bombDuration = 2000;
 const hopSpeed = 1000;
+const numStones = 5;
+const numCarrots = 15; 
 
 let app = new PIXI.Application({
     width: window.innerWidth,
@@ -24,6 +26,7 @@ app.loader
     .add("assets/scene/background.jpeg")
     .add("assets/objects/bomb.png")
     .add("assets/objects/carrot.png")
+    .add("assets/objects/stone.png")
     .add("assets/objects/rabbit.png")
     .add("assets/objects/select.png")
     .add("assets/objects/x.png")
@@ -115,7 +118,7 @@ function setup() {
     function addBombs(x, y) {
         for (let row = y - 1; row <= y + 1; row++) {
             for (let col = x - 1; col <= x + 1; col++) {
-                if (row >= 0 && row < boardHeight && col >= 0 && col < boardWidth && bombs[row][col] == undefined && !(row == 0 && col == 0)) {
+                if (row >= 0 && row < boardHeight && col >= 0 && col < boardWidth && bombs[row][col] == undefined && stones[row][col] == undefined && !(row == 0 && col == 0)) {
                     bombs[row][col] = new PIXI.Sprite(resources["assets/objects/bomb.png"].texture);
                     bombs[row][col].x = 80 * col;
                     bombs[row][col].y = 80 * row;
@@ -151,7 +154,7 @@ function setup() {
 
 
     let queue = [];
-    for (let i = 0; i < 100; i++) {
+    for (let i = 0; i < 200; i++) {
         choice = Math.floor(Math.random() * 6);
         if (choice == 0) {
             queue.push(new PIXI.Sprite(resources["assets/tiles/NE.png"].texture));
@@ -211,6 +214,7 @@ function setup() {
     }
 
 
+
     // CARROTS
     let carrotContainer = new PIXI.Container();
 
@@ -222,7 +226,7 @@ function setup() {
             carrots[row][col] = undefined;
         }
     }
-    for (let i = 0; i < 15; i++) {
+    for (let i = 0; i < numCarrots; i++) {
         do {
             var xtemp = Math.floor(Math.random() * boardWidth);
             var ytemp = Math.floor(Math.random() * boardHeight);
@@ -232,10 +236,8 @@ function setup() {
             if (xtemp == 0 && ytemp == 0) {
                 duplicate = true;
             }
-            for (let j = 0; j < carrots.length; j++) {
-                if (carrots[ytemp][xtemp] != undefined) {
-                    duplicate = true;
-                }
+            if (carrots[ytemp][xtemp] != undefined) {
+                duplicate = true;
             }
         } while (duplicate);
 
@@ -247,6 +249,43 @@ function setup() {
 
     let carrotCount = 0;
 
+
+
+
+    // STONES
+    let stoneContainer = new PIXI.Container();
+
+    let stones = [];
+    for (let row = 0; row < boardHeight; row++) {
+        stones[row] = [];
+        for (let col = 0; col < boardWidth; col++) {
+            stones[row][col] = undefined;
+        }
+    }
+    for (let i = 0; i < numStones; i++) {
+        do {
+            var xtemp = Math.floor(Math.random() * boardWidth);
+            var ytemp = Math.floor(Math.random() * boardHeight);
+
+            var duplicate = false;
+
+            if ((xtemp == 0 || xtemp == 1) && ytemp == 0) {
+                duplicate = true;
+            }
+            if (carrots[ytemp][xtemp] != undefined || stones[ytemp][xtemp] != undefined) {
+                duplicate = true;
+            }
+        } while (duplicate);
+
+        stones[ytemp][xtemp] = new PIXI.Sprite(resources["assets/objects/stone.png"].texture);
+        stones[ytemp][xtemp].x = xtemp * 80;
+        stones[ytemp][xtemp].y = ytemp * 80;
+        stoneContainer.addChild(stones[ytemp][xtemp])
+    }
+
+
+
+
     // GAME BOARD CURSOR ("SELECT")
     let select = new PIXI.Sprite(resources["assets/objects/x.png"].texture);
 
@@ -254,11 +293,11 @@ function setup() {
     function updateSelect() {
         let tempX = select.x / 80;
         let tempY = select.y / 80;
-        if (isPlaceable && board[tempY][tempX]._texture.textureCacheIds[0] != "assets/tiles/EMPTY.png") {
+        if (isPlaceable && (board[tempY][tempX]._texture.textureCacheIds[0] != "assets/tiles/EMPTY.png" || stones[tempY][tempX] != undefined)) {
             isPlaceable = false;
             select.texture = resources["assets/objects/x.png"].texture
         }
-        else if (!isPlaceable && board[tempY][tempX]._texture.textureCacheIds[0] == "assets/tiles/EMPTY.png") {
+        else if (!isPlaceable && (board[tempY][tempX]._texture.textureCacheIds[0] == "assets/tiles/EMPTY.png" && stones[tempY][tempX] == undefined)) {
             isPlaceable = true;
             select.texture = resources["assets/objects/select.png"].texture
         }
@@ -383,6 +422,12 @@ function setup() {
     }
 
 
+
+    // POWERUPS
+    //let 
+
+
+
     // INFOBAR
     let infobarContainer = new PIXI.Container();
     infobarContainer.x = infobarX;
@@ -445,7 +490,7 @@ function setup() {
             row = select.y / 80;
             col = select.x / 80;
 
-            if (board[row][col]._texture.textureCacheIds[0] == "assets/tiles/EMPTY.png") {
+            if (board[row][col]._texture.textureCacheIds[0] == "assets/tiles/EMPTY.png" && stones[row][col] == undefined) {
                 board[row][col].texture = updateQueue().texture;
 
                 updatePlayerCoords();
@@ -463,6 +508,7 @@ function setup() {
 
     boardContainer.addChild(tileContainer);
     boardContainer.addChild(carrotContainer);
+    boardContainer.addChild(stoneContainer);
     boardContainer.addChild(player);
     boardContainer.addChild(bombsContainer);
     boardContainer.addChild(select);
