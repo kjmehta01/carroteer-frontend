@@ -1,10 +1,12 @@
+import { boardEdges, queueEdges } from './borders.js';
+
 const boardWidth = 6;
 const boardHeight = 8;
 //const boardX = 200;
 const boardY = 200;
 const boardX = window.innerWidth / 2 - (boardWidth * 80 / 2);
 
-const queueX = boardX - 140;
+const queueX = boardX - 120;
 const queueY = 240;
 
 const infobarX = boardX;
@@ -37,6 +39,8 @@ app.loader
     .add("assets/tiles/SE.png")
     .add("assets/tiles/SW.png")
     .add("assets/tiles/WE.png")
+    .add("assets/tiles/edge.png")
+    .add("assets/tiles/corner.png")
     .load(setup);
 
 function setup() {
@@ -67,7 +71,7 @@ function setup() {
 
                 boardContainer.x = window.innerWidth / 2 - (boardWidth * 80 / 2);
                 infobarContainer.x = boardContainer.x;
-                queueContainer.x = boardContainer.x - 140;
+                queueContainer.x = boardContainer.x - 100;
             }, 250);
         }
     }
@@ -155,7 +159,7 @@ function setup() {
 
     let queue = [];
     for (let i = 0; i < 200; i++) {
-        choice = Math.floor(Math.random() * 6);
+        let choice = Math.floor(Math.random() * 6);
         if (choice == 0) {
             queue.push(new PIXI.Sprite(resources["assets/tiles/NE.png"].texture));
         }
@@ -181,15 +185,15 @@ function setup() {
     queueContainer.addChild(queue[0]);
 
     queue[1].x = 0;
-    queue[1].y = 160;
+    queue[1].y = 120;
     queueContainer.addChild(queue[1]);
 
     queue[2].x = 0;
-    queue[2].y = 320;
+    queue[2].y = 200;
     queueContainer.addChild(queue[2]);
 
     queue[3].x = 0;
-    queue[3].y = 480;
+    queue[3].y = 280;
     queueContainer.addChild(queue[3]);
 
 
@@ -201,13 +205,13 @@ function setup() {
         queue[0].y = 0;
 
         queue[1].x = 0;
-        queue[1].y = 160;
+        queue[1].y = 120;
 
         queue[2].x = 0;
-        queue[2].y = 320;
+        queue[2].y = 200;
 
         queue[3].x = 0;
-        queue[3].y = 480;
+        queue[3].y = 280;
         queueContainer.addChild(queue[3]);
 
         return ret;
@@ -453,10 +457,11 @@ function setup() {
     * */
     document.onkeydown = checkKey;
 
+    
     function checkKey(e) {
 
         e = e || window.event;
-
+    
         if (e.keyCode == '38' || e.keyCode == '87') {
             // up arrow or w
             if (select.y != 0) {
@@ -487,24 +492,36 @@ function setup() {
         }
         else if (e.keyCode == '74') {
             // j
-            row = select.y / 80;
-            col = select.x / 80;
-
+            let row = select.y / 80;
+            let col = select.x / 80;
+    
             if (board[row][col]._texture.textureCacheIds[0] == "assets/tiles/EMPTY.png" && stones[row][col] == undefined) {
                 board[row][col].texture = updateQueue().texture;
-
+    
                 updatePlayerCoords();
                 updateSelect();
             }
         }
         else if (e.keyCode == '75') {
             // k
-            row = select.y / 80;
-            col = select.x / 80;
+            let row = select.y / 80;
+            let col = select.x / 80;
             addBombs(col, row);
         }
-
+    
     }
+
+
+    //board edge
+    let edgeContainer = boardEdges(resources["assets/tiles/corner.png"].texture, resources["assets/tiles/edge.png"].texture, boardHeight, boardWidth, queueX, queueY);
+
+
+    // queue edge
+    let queueEdgeContainer = queueEdges(resources["assets/tiles/corner.png"].texture, resources["assets/tiles/edge.png"].texture, boardHeight, boardWidth, queueX, queueY);
+
+
+    
+
 
     boardContainer.addChild(tileContainer);
     boardContainer.addChild(carrotContainer);
@@ -512,7 +529,9 @@ function setup() {
     boardContainer.addChild(player);
     boardContainer.addChild(bombsContainer);
     boardContainer.addChild(select);
+    boardContainer.addChild(edgeContainer);
 
+    queueContainer.addChild(queueEdgeContainer);
 
     app.stage.addChild(background);
     app.stage.addChild(queueContainer);
@@ -520,4 +539,5 @@ function setup() {
     app.stage.addChild(infobarContainer);
 
 }
+
 
