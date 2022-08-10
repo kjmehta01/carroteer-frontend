@@ -1,0 +1,22 @@
+body{
+    margin: 0%;
+}
+button{
+    width: 50%;
+    height: 100vh;
+    background-size: 100%;
+    background-color: rgba(0, 0, 0, 0.7); /* Tint color */
+    background-blend-mode: multiply;
+    transition-duration: 0.4s;
+    font-size:3vw;
+    font-family: 'Sigmar One'  ;
+}
+button:hover{
+    background-color: rgba(0,0,0,0);
+}
+#left{
+    background-image: url("background.png");
+}
+#right{
+    background-image: url("network.jpg");
+}

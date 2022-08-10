@@ -134,6 +134,7 @@ function setup() {
                         bombsContainer.removeChild(bombs[row][col]);
                         bombs[row][col] = undefined;
                         removeTile(row, col);
+                        updateSelect();
 
                         if (playerX == col && playerY == row) {
                             playerX = 0;
