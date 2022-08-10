@@ -48,9 +48,10 @@ function setup() {
 
     // Create the background and add it to the stage
     let background = new PIXI.Sprite(resources["assets/scene/background.jpeg"].texture);
-    background.width = window.innerWidth;
-    background.height = window.innerHeight;
+    background.width = app.screen.width;
+    background.height = app.screen.height;
 
+    
     window.addEventListener('resize', resize);
 
     // Resize function window
@@ -71,11 +72,10 @@ function setup() {
 
                 boardContainer.x = window.innerWidth / 2 - (boardWidth * 80 / 2);
                 infobarContainer.x = boardContainer.x;
-                queueContainer.x = boardContainer.x - 100;
+                queueContainer.x = boardContainer.x - 120;
             }, 250);
         }
     }
-
 
     //overarching board container
     const boardContainer = new PIXI.Container();
