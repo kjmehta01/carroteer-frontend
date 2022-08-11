@@ -1,7 +1,7 @@
 import { boardEdges, queueEdges } from './borders.js';
 
-const boardWidth = 4;
-const boardHeight = 6;
+const boardWidth = 5;
+const boardHeight = 7;
 //const boardX = 200;
 const boardY = 200;
 const boardX = window.innerWidth / 2 - (boardWidth * 80 / 2);
