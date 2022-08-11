@@ -1,7 +1,7 @@
 import { boardEdges, queueEdges } from './borders.js';
 
-const boardWidth = 6;
-const boardHeight = 8;
+const boardWidth = 4;
+const boardHeight = 6;
 //const boardX = 200;
 const boardY = 200;
 const boardX = window.innerWidth / 2 - (boardWidth * 80 / 2);
@@ -15,7 +15,7 @@ const infobarY = 50;
 const bombDuration = 2000;
 const hopSpeed = 1000;
 const numStones = 5;
-const numCarrots = 15; 
+const numCarrots = 5; 
 
 let app = new PIXI.Application({
     width: window.innerWidth,
