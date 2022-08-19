@@ -15,7 +15,7 @@ const infobarY = 50;
 const bombDuration = 2000;
 const hopSpeed = 1000;
 const numStones = 5;
-const numCarrots = 5; 
+const numCarrots = 1;
 
 let app = new PIXI.Application({
     width: window.innerWidth,
@@ -26,6 +26,7 @@ document.body.appendChild(app.view);
 
 app.loader
     .add("assets/scene/background.jpeg")
+    .add("assets/scene/winbackground.jpg")
     .add("assets/objects/bomb.png")
     .add("assets/objects/carrot.png")
     .add("assets/objects/stone.png")
@@ -41,6 +42,12 @@ app.loader
     .add("assets/tiles/WE.png")
     .add("assets/tiles/edge.png")
     .add("assets/tiles/corner.png")
+    .add("assets/ui/exitpressed.png")
+    .add("assets/ui/exitunpressed.png")
+    .add("assets/ui/resetpressed.png")
+    .add("assets/ui/resetunpressed.png")
+    .add("assets/ui/submitpressed.png")
+    .add("assets/ui/submitunpressed.png")
     .load(setup);
 
 function setup() {
@@ -51,7 +58,7 @@ function setup() {
     background.width = app.screen.width;
     background.height = app.screen.height;
 
-    
+
     window.addEventListener('resize', resize);
 
     // Resize function window
@@ -73,6 +80,9 @@ function setup() {
                 boardContainer.x = window.innerWidth / 2 - (boardWidth * 80 / 2);
                 infobarContainer.x = boardContainer.x;
                 queueContainer.x = boardContainer.x - 120;
+
+                winScreenContainer.x = window.innerWidth / 2 - winScreenContainer.width / 2;
+                winScreenContainer.y = window.innerHeight / 2 - winScreenContainer.height / 2;
             }, 250);
         }
     }
@@ -326,6 +336,7 @@ function setup() {
             carrots[playerY][playerX] = undefined;
             carrotCount++;
             carrotText.text = carrotCount;
+            checkWin();
         }
     }
 
@@ -434,21 +445,198 @@ function setup() {
 
 
     // INFOBAR
+    let startTime = 0;
     let infobarContainer = new PIXI.Container();
-    infobarContainer.x = infobarX;
-    infobarContainer.y = infobarY;
 
     let infoCarrot = new PIXI.Sprite(resources["assets/objects/carrot.png"].texture);
-    infoCarrot.width = 100;
-    infoCarrot.height = 100;
+    infoCarrot.width = 50;
+    infoCarrot.height = 50;
     infobarContainer.addChild(infoCarrot);
 
-    let carrotText = new PIXI.Text(carrotCount, { fontFamily: 'Arial', fontSize: 108, fill: 0x444444, align: 'center' });
-    carrotText.x = 100;
+    let carrotText = new PIXI.Text(carrotCount, { fontFamily: ['Consolas'], fontSize: 56, fill: 0x444444, align: 'center' });
+    carrotText.x = 50;
     infobarContainer.addChild(carrotText);
 
 
+    let timer = new PIXI.Text("0:00", { fontFamily: ['Consolas'], fontSize: 56, fill: 0x444444, align: 'center' });
+    timer.x = boardWidth*80 - timer.width;
 
+    function setTime() {
+        if (startTime != 0) {
+            let elapsed = (Date.now() - startTime) / 1000;
+            let mins = Math.floor(elapsed / 60);
+            let secs = String(Math.round(elapsed % 60)).padStart(2, '0');
+            timer.text = mins + ":" + secs;
+            timer.x = boardWidth*80 - timer.width;
+        }
+    }
+
+    infobarContainer.addChild(timer);
+
+
+    infobarContainer.x = boardX;
+    infobarContainer.y = boardY - infobarContainer.height - 30;
+
+
+
+
+
+    // WIN SCREEN
+    let winScreenContainer = new PIXI.Container();
+    let margConst = 50;
+
+
+    let outerBox = new PIXI.Sprite(resources['assets/scene/winbackground.jpg'].texture);
+    outerBox.width = 1100;
+    outerBox.height = 550;
+    winScreenContainer.addChild(outerBox);
+    winScreenContainer.x = window.innerWidth / 2 - winScreenContainer.width / 2;
+    winScreenContainer.y = window.innerHeight / 2 - winScreenContainer.height / 2;
+
+    let winText = new PIXI.Text("you collected all the carrots", { fontFamily: 'Consolas', fontSize: 56, fill: 0x000000, align: 'right', wordWrap: true, wordWrapWidth: 500 });
+    winText.x = winScreenContainer.width / 2 - winText.width - margConst;
+    winText.y = 50
+    winScreenContainer.addChild(winText);
+
+
+    let resetButton = new PIXI.Sprite(resources["assets/ui/resetunpressed.png"].texture);
+    resetButton.height = 100;
+    resetButton.length = 100;
+    resetButton.x = winScreenContainer.width / 2 - resetButton.width - margConst;
+    resetButton.y = 380;
+
+    resetButton.interactive = true;
+    resetButton.buttonMode = true;
+    resetButton.on('mouseover', resetButtonMouseover);
+    resetButton.on('mouseout', resetButtonMouseout);
+    resetButton.on('click', resetButtonClick);
+
+    function resetButtonMouseover() {
+        resetButton.texture = resources["assets/ui/resetpressed.png"].texture;
+    }
+    function resetButtonMouseout() {
+        resetButton.texture = resources["assets/ui/resetunpressed.png"].texture;
+    }
+    function resetButtonClick() {
+        window.location.reload();
+    }
+    winScreenContainer.addChild(resetButton);
+
+
+    let exitButton = new PIXI.Sprite(resources["assets/ui/exitunpressed.png"].texture);
+    exitButton.height = 100;
+    exitButton.length = 100;
+    exitButton.x = winScreenContainer.width / 2 - exitButton.width * 3 - margConst;
+    exitButton.y = 380;
+
+    exitButton.interactive = true;
+    exitButton.buttonMode = true;
+    exitButton.on('mouseover', exitButtonMouseover);
+    exitButton.on('mouseout', exitButtonMouseout);
+    exitButton.on('click', exitButtonClick);
+
+    function exitButtonMouseover() {
+        exitButton.texture = resources["assets/ui/exitpressed.png"].texture;
+    }
+    function exitButtonMouseout() {
+        exitButton.texture = resources["assets/ui/exitunpressed.png"].texture;
+    }
+    function exitButtonClick() {
+        location.href = '/';
+    }
+    winScreenContainer.addChild(exitButton);
+
+
+    let blocksPlaced = 0;
+    function checkWin() {
+        if (carrotCount == numCarrots) {
+            let elapsed = (Date.now() - startTime) / 1000;
+            let mins = Math.floor(elapsed / 60);
+            let secs = String(Math.round(elapsed % 60)).padStart(2, '0');
+            let timeText = new PIXI.Text("time: " + mins + ":" + secs, { fontFamily: 'Consolas', fontSize: 48, fill: 0x000000, align: 'center' });
+            timeText.x = winScreenContainer.width / 2 - timeText.width - margConst;
+            timeText.y = winText.y + winText.height + 60;
+            winScreenContainer.addChild(timeText);
+
+            let blockText = new PIXI.Text("blocks: " + blocksPlaced, { fontFamily: 'Consolas', fontSize: 48, fill: 0x000000, align: 'center' });
+            blockText.x = winScreenContainer.width / 2 - blockText.width - margConst;
+            blockText.y = winText.y + winText.height + blockText.height + 65;
+            winScreenContainer.addChild(blockText);
+
+
+            app.stage.addChild(winScreenContainer);
+        }
+    }
+
+
+    async function getLeaderboard() {
+        const response = await fetch('http://localhost:3000/getScores');
+        const json = await response.json();
+
+        let leaderboardText = new PIXI.Text("Leaderboard:", { fontFamily: 'Consolas', fontSize: 48, fill: 0x000000, align: 'center' });
+        leaderboardText.x = winScreenContainer.width / 2 + margConst;
+        leaderboardText.y = 80
+        winScreenContainer.addChild(leaderboardText);
+
+        for (let i = 0; i < json.length; i++) {
+            let mins = Math.floor(json[i].time / 60);
+            let secs = String(Math.round(json[i].time % 60)).padStart(2, '0');
+            let time = mins + ":" + secs;
+            let leaderboardEntryText = new PIXI.Text((i + 1) + ". " + json[i].name + " - " + time, { fontFamily: 'Consolas', fontSize: 36, fill: 0x000000, align: 'left' });
+            leaderboardEntryText.x = winScreenContainer.width / 2 + margConst;
+            leaderboardEntryText.y = 50 + leaderboardText.height + 50 + leaderboardEntryText.height * i;
+            winScreenContainer.addChild(leaderboardEntryText);
+        }
+
+
+        let youWonText = new PIXI.Text("Submit your highscore!!", { fontFamily: 'Consolas', fontSize: 24, fill: 0x000000, align: 'center' });
+        youWonText.x = winScreenContainer.width / 2 + margConst;
+        youWonText.y = 400
+        winScreenContainer.addChild(youWonText);
+
+        let input = new PIXI.TextInput({
+            input: {
+                fontSize: '24px',
+                padding: '10px',
+                width: '200px',
+                color: '#26272E'
+            },
+            box: {
+                default: { fill: 0xE8E9F3, rounded: 12, stroke: { color: 0xCBCEE0, width: 3 } },
+                focused: { fill: 0xE1E3EE, rounded: 12, stroke: { color: 0xABAFC6, width: 3 } },
+                disabled: { fill: 0xDBDBDB, rounded: 12 }
+            }
+        })
+        input.placeholder = "Name";
+        input.x = winScreenContainer.width / 2 + margConst;
+        input.y = 430;
+        winScreenContainer.addChild(input);
+
+        let submitButton = new PIXI.Sprite(resources["assets/ui/submitunpressed.png"].texture);
+        submitButton.height = 50;
+        submitButton.length = 50;
+        submitButton.x = winScreenContainer.width / 2 + 300;
+        submitButton.y = 430;
+
+        submitButton.interactive = true;
+        submitButton.buttonMode = true;
+        submitButton.on('mouseover', submitButtonMouseover);
+        submitButton.on('mouseout', submitButtonMouseout);
+        submitButton.on('click', submitButtonClick);
+
+        function submitButtonMouseover() {
+            submitButton.texture = resources["assets/ui/submitpressed.png"].texture;
+        }
+        function submitButtonMouseout() {
+            submitButton.texture = resources["assets/ui/submitunpressed.png"].texture;
+        }
+        function submitButtonClick() {
+            window.location.reload();
+        }
+        winScreenContainer.addChild(submitButton);
+    }
+
+    getLeaderboard();
 
 
     /*
@@ -458,11 +646,11 @@ function setup() {
     * */
     document.onkeydown = checkKey;
 
-    
+
     function checkKey(e) {
 
         e = e || window.event;
-    
+
         if (e.keyCode == '38' || e.keyCode == '87') {
             // up arrow or w
             if (select.y != 0) {
@@ -491,16 +679,23 @@ function setup() {
             }
             updateSelect();
         }
-        else if (e.keyCode == '74') {
+        else if (e.keyCode == '74' || e.keyCode == '32') {
             // j
             let row = select.y / 80;
             let col = select.x / 80;
-    
+
             if (board[row][col]._texture.textureCacheIds[0] == "assets/tiles/EMPTY.png" && stones[row][col] == undefined) {
+                if (startTime == 0) {
+                    startTime = Date.now();
+                    setInterval(setTime, 1000);
+                }
+
                 board[row][col].texture = updateQueue().texture;
-    
+
                 updatePlayerCoords();
                 updateSelect();
+
+                blocksPlaced++;
             }
         }
         else if (e.keyCode == '75') {
@@ -509,7 +704,7 @@ function setup() {
             let col = select.x / 80;
             addBombs(col, row);
         }
-    
+
     }
 
 
@@ -521,7 +716,7 @@ function setup() {
     let queueEdgeContainer = queueEdges(resources["assets/tiles/corner.png"].texture, resources["assets/tiles/edge.png"].texture, boardHeight, boardWidth, queueX, queueY);
 
 
-    
+
 
 
     boardContainer.addChild(tileContainer);
