@@ -21,7 +21,7 @@ const infobarY = 50;
 const bombDuration = 2000;
 const hopSpeed = 1000;
 const numStones = 5;
-const numCarrots = 1;
+const numCarrots = 5;
 
 let app = new PIXI.Application({
     width: window.innerWidth,
