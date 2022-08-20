@@ -1,13 +1,19 @@
 import { boardEdges, queueEdges } from './borders.js';
 
+WebFont.load({
+    google: {
+        families: ['DynaPuff']
+    }
+});
+
 const boardWidth = 5;
 const boardHeight = 7;
 //const boardX = 200;
-const boardY = 200;
+const boardY = 150;
 const boardX = window.innerWidth / 2 - (boardWidth * 80 / 2);
 
 const queueX = boardX - 120;
-const queueY = 240;
+const queueY = 200;
 
 const infobarX = boardX;
 const infobarY = 50;
@@ -453,13 +459,13 @@ function setup() {
     infoCarrot.height = 50;
     infobarContainer.addChild(infoCarrot);
 
-    let carrotText = new PIXI.Text(carrotCount, { fontFamily: ['Consolas'], fontSize: 56, fill: 0x444444, align: 'center' });
+    let carrotText = new PIXI.Text(carrotCount, { fontFamily: ['DynaPuff'], fontSize: 56, fill: 0x444444, align: 'center' });
     carrotText.x = 50;
     infobarContainer.addChild(carrotText);
 
 
-    let timer = new PIXI.Text("0:00", { fontFamily: ['Consolas'], fontSize: 56, fill: 0x444444, align: 'center' });
-    timer.x = boardWidth*80 - timer.width;
+    let timer = new PIXI.Text("0:00", { fontFamily: ['DynaPuff'], fontSize: 56, fill: 0x444444, align: 'center' });
+    timer.x = boardWidth * 80 - timer.width;
 
     function setTime() {
         if (startTime != 0) {
@@ -467,11 +473,12 @@ function setup() {
             let mins = Math.floor(elapsed / 60);
             let secs = String(Math.round(elapsed % 60)).padStart(2, '0');
             timer.text = mins + ":" + secs;
-            timer.x = boardWidth*80 - timer.width;
+            timer.x = boardWidth * 80 - timer.width;
         }
     }
 
     infobarContainer.addChild(timer);
+    let timerInterval = undefined;
 
 
     infobarContainer.x = boardX;
@@ -493,7 +500,7 @@ function setup() {
     winScreenContainer.x = window.innerWidth / 2 - winScreenContainer.width / 2;
     winScreenContainer.y = window.innerHeight / 2 - winScreenContainer.height / 2;
 
-    let winText = new PIXI.Text("you collected all the carrots", { fontFamily: 'Consolas', fontSize: 56, fill: 0x000000, align: 'right', wordWrap: true, wordWrapWidth: 500 });
+    let winText = new PIXI.Text("you collected all the carrots", { fontFamily: 'DynaPuff', fontSize: 48, fill: 0x000000, align: 'right', wordWrap: true, wordWrapWidth: 420 });
     winText.x = winScreenContainer.width / 2 - winText.width - margConst;
     winText.y = 50
     winScreenContainer.addChild(winText);
@@ -550,90 +557,145 @@ function setup() {
     let blocksPlaced = 0;
     function checkWin() {
         if (carrotCount == numCarrots) {
-            let elapsed = (Date.now() - startTime) / 1000;
+            clearInterval(timerInterval);
+
+            let elapsed = Math.floor((Date.now() - startTime) / 1000);
             let mins = Math.floor(elapsed / 60);
-            let secs = String(Math.round(elapsed % 60)).padStart(2, '0');
-            let timeText = new PIXI.Text("time: " + mins + ":" + secs, { fontFamily: 'Consolas', fontSize: 48, fill: 0x000000, align: 'center' });
+            let secs = String(elapsed % 60).padStart(2, '0');
+            let timeText = new PIXI.Text("time: " + mins + ":" + secs, { fontFamily: 'DynaPuff', fontSize: 48, fill: 0x000000, align: 'center' });
             timeText.x = winScreenContainer.width / 2 - timeText.width - margConst;
             timeText.y = winText.y + winText.height + 60;
             winScreenContainer.addChild(timeText);
 
-            let blockText = new PIXI.Text("blocks: " + blocksPlaced, { fontFamily: 'Consolas', fontSize: 48, fill: 0x000000, align: 'center' });
+            let blockText = new PIXI.Text("blocks: " + blocksPlaced, { fontFamily: 'DynaPuff', fontSize: 48, fill: 0x000000, align: 'center' });
             blockText.x = winScreenContainer.width / 2 - blockText.width - margConst;
             blockText.y = winText.y + winText.height + blockText.height + 65;
             winScreenContainer.addChild(blockText);
+
+            if (elapsed < highestTime) {
+
+                let youWonText = new PIXI.Text("submit your highscore!!", { fontFamily: 'DynaPuff', fontSize: 24, fill: 0x000000, align: 'center' });
+                youWonText.x = winScreenContainer.width / 2 + margConst;
+                youWonText.y = 400
+                winScreenContainer.addChild(youWonText);
+
+                let input = new PIXI.TextInput({
+                    input: {
+                        font: 'DynaPuff',
+                        fontSize: '24px',
+                        padding: '10px',
+                        width: '200px',
+                        color: '#26272E'
+                    },
+                    box: {
+                        default: { fill: 0xE8E9F3, rounded: 12, stroke: { color: 0xCBCEE0, width: 3 } },
+                        focused: { fill: 0xE1E3EE, rounded: 12, stroke: { color: 0xABAFC6, width: 3 } },
+                        disabled: { fill: 0xDBDBDB, rounded: 12 }
+                    }
+                })
+                input.placeholder = "name";
+                input.maxLength = 10;
+                input.x = winScreenContainer.width / 2 + margConst;
+                input.y = 430;
+                winScreenContainer.addChild(input);
+
+                let submitButton = new PIXI.Sprite(resources["assets/ui/submitunpressed.png"].texture);
+                submitButton.height = 50;
+                submitButton.length = 50;
+                submitButton.x = winScreenContainer.width / 2 + 300;
+                submitButton.y = 430;
+
+                submitButton.interactive = true;
+                submitButton.buttonMode = true;
+                submitButton.on('mouseover', submitButtonMouseover);
+                submitButton.on('mouseout', submitButtonMouseout);
+                submitButton.on('click', submitButtonClick);
+
+                function submitButtonMouseover() {
+                    submitButton.texture = resources["assets/ui/submitpressed.png"].texture;
+                }
+                function submitButtonMouseout() {
+                    submitButton.texture = resources["assets/ui/submitunpressed.png"].texture;
+                }
+                function submitButtonClick() {
+                    if (input.text != "") {
+                        addScore(input.text, elapsed);
+                    }
+                }
+                winScreenContainer.addChild(submitButton);
+            }
+            else {
+                resetButton.x = winScreenContainer.width / 2 - resetButton.width - margConst;
+                exitButton.x = winScreenContainer.width / 2 + margConst;
+            }
 
 
             app.stage.addChild(winScreenContainer);
         }
     }
 
+    async function addScore(n, t) {
+        const response = await fetch('http://localhost:3000/addScore', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                name: n,
+                time: t
+            })
+        });
+        const json = await response.json();
 
+        for (let i = 0; i < 5; i++) {
+            if (i < json.length) {
+                let mins = Math.floor(json[i].time / 60);
+                let secs = String(json[i].time % 60).padStart(2, '0');
+                let time = mins + ":" + secs;
+                leaderboardEntries[i].text = (i + 1) + ". " + json[i].name + " - " + time;
+            }
+            else{
+                leaderboardEntries[i].text = (i + 1) + ".";
+            }
+        }
+    }
+
+    let highestTime = -1;
+    let leaderboardEntries = [];
     async function getLeaderboard() {
         const response = await fetch('http://localhost:3000/getScores');
         const json = await response.json();
 
-        let leaderboardText = new PIXI.Text("Leaderboard:", { fontFamily: 'Consolas', fontSize: 48, fill: 0x000000, align: 'center' });
+        let leaderboardText = new PIXI.Text("leaderboard:", { fontFamily: 'DynaPuff', fontSize: 48, fill: 0x000000, align: 'center' });
         leaderboardText.x = winScreenContainer.width / 2 + margConst;
-        leaderboardText.y = 80
+        leaderboardText.y = 50
         winScreenContainer.addChild(leaderboardText);
 
-        for (let i = 0; i < json.length; i++) {
-            let mins = Math.floor(json[i].time / 60);
-            let secs = String(Math.round(json[i].time % 60)).padStart(2, '0');
-            let time = mins + ":" + secs;
-            let leaderboardEntryText = new PIXI.Text((i + 1) + ". " + json[i].name + " - " + time, { fontFamily: 'Consolas', fontSize: 36, fill: 0x000000, align: 'left' });
-            leaderboardEntryText.x = winScreenContainer.width / 2 + margConst;
-            leaderboardEntryText.y = 50 + leaderboardText.height + 50 + leaderboardEntryText.height * i;
-            winScreenContainer.addChild(leaderboardEntryText);
-        }
+        for (let i = 0; i < 5; i++) {
+            let leaderboardEntryText = undefined;
+            if (i < json.length) {
+                if (json[i].time > highestTime) {
+                    highestTime = json[i].time;
+                }
 
-
-        let youWonText = new PIXI.Text("Submit your highscore!!", { fontFamily: 'Consolas', fontSize: 24, fill: 0x000000, align: 'center' });
-        youWonText.x = winScreenContainer.width / 2 + margConst;
-        youWonText.y = 400
-        winScreenContainer.addChild(youWonText);
-
-        let input = new PIXI.TextInput({
-            input: {
-                fontSize: '24px',
-                padding: '10px',
-                width: '200px',
-                color: '#26272E'
-            },
-            box: {
-                default: { fill: 0xE8E9F3, rounded: 12, stroke: { color: 0xCBCEE0, width: 3 } },
-                focused: { fill: 0xE1E3EE, rounded: 12, stroke: { color: 0xABAFC6, width: 3 } },
-                disabled: { fill: 0xDBDBDB, rounded: 12 }
+                let mins = Math.floor(json[i].time / 60);
+                let secs = String(json[i].time % 60).padStart(2, '0');
+                let time = mins + ":" + secs;
+                leaderboardEntryText = new PIXI.Text((i + 1) + ". " + json[i].name + " - " + time, { fontFamily: 'DynaPuff', fontSize: 36, fill: 0x000000, align: 'left' });
             }
-        })
-        input.placeholder = "Name";
-        input.x = winScreenContainer.width / 2 + margConst;
-        input.y = 430;
-        winScreenContainer.addChild(input);
-
-        let submitButton = new PIXI.Sprite(resources["assets/ui/submitunpressed.png"].texture);
-        submitButton.height = 50;
-        submitButton.length = 50;
-        submitButton.x = winScreenContainer.width / 2 + 300;
-        submitButton.y = 430;
-
-        submitButton.interactive = true;
-        submitButton.buttonMode = true;
-        submitButton.on('mouseover', submitButtonMouseover);
-        submitButton.on('mouseout', submitButtonMouseout);
-        submitButton.on('click', submitButtonClick);
-
-        function submitButtonMouseover() {
-            submitButton.texture = resources["assets/ui/submitpressed.png"].texture;
+            else {
+                leaderboardEntryText = new PIXI.Text((i + 1) + ".", { fontFamily: 'DynaPuff', fontSize: 36, fill: 0x000000, align: 'left' });
+            }
+            leaderboardEntryText.x = winScreenContainer.width / 2 + margConst;
+            leaderboardEntryText.y = 20 + leaderboardText.height + 40 + leaderboardEntryText.height * i;
+            winScreenContainer.addChild(leaderboardEntryText);
+            leaderboardEntries.push(leaderboardEntryText);
         }
-        function submitButtonMouseout() {
-            submitButton.texture = resources["assets/ui/submitunpressed.png"].texture;
-        }
-        function submitButtonClick() {
-            window.location.reload();
-        }
-        winScreenContainer.addChild(submitButton);
+
+        let timeResetText = new PIXI.Text("resets daily at 1pm est", { fontFamily: 'DynaPuff', fontSize: 24, fill: 0x000000, align: 'center' });
+        timeResetText.x = winScreenContainer.width / 2 + margConst;
+        timeResetText.y = leaderboardEntries[4].y + leaderboardEntries[4].height + 5;
+        winScreenContainer.addChild(timeResetText);
     }
 
     getLeaderboard();
@@ -687,7 +749,7 @@ function setup() {
             if (board[row][col]._texture.textureCacheIds[0] == "assets/tiles/EMPTY.png" && stones[row][col] == undefined) {
                 if (startTime == 0) {
                     startTime = Date.now();
-                    setInterval(setTime, 1000);
+                    timerInterval = setInterval(setTime, 1000);
                 }
 
                 board[row][col].texture = updateQueue().texture;
