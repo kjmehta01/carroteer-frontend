@@ -21,7 +21,7 @@ const infobarY = 50;
 const bombDuration = 2000;
 const hopSpeed = 1000;
 const numStones = 5;
-const numCarrots = 5;
+const numCarrots = 1;
 
 let app = new PIXI.Application({
     width: window.innerWidth,
@@ -33,6 +33,7 @@ document.body.appendChild(app.view);
 app.loader
     .add("assets/scene/background.jpeg")
     .add("assets/scene/winbackground.jpg")
+    .add("assets/scene/black.jpg")
     .add("assets/objects/bomb.png")
     .add("assets/objects/carrot.png")
     .add("assets/objects/stone.png")
@@ -82,6 +83,9 @@ function setup() {
                 // it handles resolution
                 background.width = app.screen.width;
                 background.height = app.screen.height;
+
+                blackLayer.width = window.innerWidth;
+                blackLayer.height = window.innerHeight;
 
                 boardContainer.x = window.innerWidth / 2 - (boardWidth * 80 / 2);
                 infobarContainer.x = boardContainer.x;
@@ -489,6 +493,15 @@ function setup() {
 
 
     // WIN SCREEN
+    let blackLayer = new PIXI.Container();
+
+    let blackSprite = new PIXI.Sprite(resources['assets/scene/black.jpg'].texture);
+    blackSprite.alpha = 0.8;
+
+    blackLayer.addChild(blackSprite);
+    blackLayer.width = window.innerWidth;
+    blackLayer.height = window.innerHeight;
+
     let winScreenContainer = new PIXI.Container();
     let margConst = 50;
 
@@ -572,7 +585,7 @@ function setup() {
             blockText.y = winText.y + winText.height + blockText.height + 65;
             winScreenContainer.addChild(blockText);
 
-            if (elapsed < highestTime) {
+            if (elapsed < highestTime || numEntries < 5) {
 
                 let youWonText = new PIXI.Text("submit your highscore!!", { fontFamily: 'DynaPuff', fontSize: 24, fill: 0x000000, align: 'center' });
                 youWonText.x = winScreenContainer.width / 2 + margConst;
@@ -601,7 +614,7 @@ function setup() {
 
                 let submitButton = new PIXI.Sprite(resources["assets/ui/submitunpressed.png"].texture);
                 submitButton.height = 50;
-                submitButton.length = 50;
+                submitButton.width = 50;
                 submitButton.x = winScreenContainer.width / 2 + 300;
                 submitButton.y = 430;
 
@@ -630,6 +643,7 @@ function setup() {
             }
 
 
+            app.stage.addChild(blackLayer);
             app.stage.addChild(winScreenContainer);
         }
     }
@@ -654,13 +668,14 @@ function setup() {
                 let time = mins + ":" + secs;
                 leaderboardEntries[i].text = (i + 1) + ". " + json[i].name + " - " + time;
             }
-            else{
+            else {
                 leaderboardEntries[i].text = (i + 1) + ".";
             }
         }
     }
 
     let highestTime = -1;
+    let numEntries = 0;
     let leaderboardEntries = [];
     async function getLeaderboard() {
         const response = await fetch('http://localhost:3000/getScores');
@@ -677,6 +692,7 @@ function setup() {
                 if (json[i].time > highestTime) {
                     highestTime = json[i].time;
                 }
+                numEntries++;
 
                 let mins = Math.floor(json[i].time / 60);
                 let secs = String(json[i].time % 60).padStart(2, '0');
