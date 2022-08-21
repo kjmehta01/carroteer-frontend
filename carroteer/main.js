@@ -6,7 +6,7 @@ WebFont.load({
     }
 });
 
-const url = 'https://carroteer-backend.herokuapp.com/';
+const url = 'https://carroteer-backend.herokuapp.com';
 
 const boardWidth = 5;
 const boardHeight = 7;
