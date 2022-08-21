@@ -635,6 +635,8 @@ function setup() {
                 function submitButtonClick() {
                     if (input.text != "") {
                         addScore(input.text, elapsed);
+                        input.disabled = true;
+                        winScreenContainer.removeChild(submitButton);
                     }
                 }
                 winScreenContainer.addChild(submitButton);
