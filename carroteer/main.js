@@ -6,6 +6,8 @@ WebFont.load({
     }
 });
 
+const url = 'https://carroteer-backend.herokuapp.com/';
+
 const boardWidth = 5;
 const boardHeight = 7;
 //const boardX = 200;
@@ -649,7 +651,7 @@ function setup() {
     }
 
     async function addScore(n, t) {
-        const response = await fetch('http://localhost:3000/addScore', {
+        const response = await fetch(url + '/addScore', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -678,7 +680,7 @@ function setup() {
     let numEntries = 0;
     let leaderboardEntries = [];
     async function getLeaderboard() {
-        const response = await fetch('http://localhost:3000/getScores');
+        const response = await fetch(url + '/getScores');
         const json = await response.json();
 
         let leaderboardText = new PIXI.Text("leaderboard:", { fontFamily: 'DynaPuff', fontSize: 48, fill: 0x000000, align: 'center' });
