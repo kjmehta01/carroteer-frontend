@@ -6,7 +6,7 @@ WebFont.load({
     }
 });
 
-const url = 'http://localhost:5000';
+const url = 'https://carroteer-backend.herokuapp.com';
 
 const boardWidth = 5;
 const boardHeight = 7;
@@ -716,7 +716,7 @@ function setup() {
             leaderboardEntries.push(leaderboardEntryText);
         }
 
-        let timeResetText = new PIXI.Text("resets daily at 1pm est", { fontFamily: 'DynaPuff', fontSize: 24, fill: 0x000000, align: 'center' });
+        let timeResetText = new PIXI.Text("resets daily at 10am est", { fontFamily: 'DynaPuff', fontSize: 24, fill: 0x000000, align: 'center' });
         timeResetText.x = winScreenContainer.width / 2 + margConst;
         timeResetText.y = leaderboardEntries[4].y + leaderboardEntries[4].height + 5;
         winScreenContainer.addChild(timeResetText);
