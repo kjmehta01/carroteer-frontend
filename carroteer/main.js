@@ -6,6 +6,7 @@ WebFont.load({
     }
 });
 
+//const url = 'http://localhost:5000';
 const url = 'https://carroteer-backend.herokuapp.com';
 
 const boardWidth = 5;
@@ -23,7 +24,7 @@ const infobarY = 50;
 const bombDuration = 2000;
 const hopSpeed = 1000;
 const numStones = 5;
-const numCarrots = 1;
+const numCarrots = 5;
 
 let app = new PIXI.Application({
     width: window.innerWidth,
@@ -663,8 +664,7 @@ function setup() {
                 time: t
             })
         });
-        const status = await response.status();
-        if (status == 200) {
+        if (response.status == 200) {
             const response2 = await fetch(url + '/getScores');
             const json = await response2.json();
 
