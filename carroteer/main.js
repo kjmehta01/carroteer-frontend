@@ -6,7 +6,7 @@ WebFont.load({
     }
 });
 
-const url = 'https://carroteer-backend.herokuapp.com';
+const url = 'http://localhost:5000';
 
 const boardWidth = 5;
 const boardHeight = 7;
@@ -23,7 +23,7 @@ const infobarY = 50;
 const bombDuration = 2000;
 const hopSpeed = 1000;
 const numStones = 5;
-const numCarrots = 5;
+const numCarrots = 1;
 
 let app = new PIXI.Application({
     width: window.innerWidth,
@@ -663,17 +663,21 @@ function setup() {
                 time: t
             })
         });
-        const json = await response.json();
+        const status = await response.status();
+        if (status == 200) {
+            const response2 = await fetch(url + '/getScores');
+            const json = await response2.json();
 
-        for (let i = 0; i < 5; i++) {
-            if (i < json.length) {
-                let mins = Math.floor(json[i].time / 60);
-                let secs = String(json[i].time % 60).padStart(2, '0');
-                let time = mins + ":" + secs;
-                leaderboardEntries[i].text = (i + 1) + ". " + json[i].name + " - " + time;
-            }
-            else {
-                leaderboardEntries[i].text = (i + 1) + ".";
+            for (let i = 0; i < 5; i++) {
+                if (i < json.length) {
+                    let mins = Math.floor(json[i].time / 60);
+                    let secs = String(json[i].time % 60).padStart(2, '0');
+                    let time = mins + ":" + secs;
+                    leaderboardEntries[i].text = (i + 1) + ". " + json[i].name + " - " + time;
+                }
+                else {
+                    leaderboardEntries[i].text = (i + 1) + ".";
+                }
             }
         }
     }
