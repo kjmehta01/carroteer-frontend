@@ -50,37 +50,37 @@ socket.on('connect', function () {
     document.body.appendChild(app.view);
 
     app.loader
-        .add("assets/scene/background.jpeg")
-        .add("assets/scene/winbackground.jpg")
-        .add("assets/scene/black.jpg")
-        .add("assets/objects/bomb.png")
-        .add("assets/objects/carrot.png")
-        .add("assets/objects/stone.png")
-        .add("assets/objects/rabbit.png")
-        .add("assets/objects/select.png")
-        .add("assets/objects/x.png")
-        .add("assets/tiles/E.png")
-        .add("assets/tiles/NE.png")
-        .add("assets/tiles/NS.png")
-        .add("assets/tiles/NW.png")
-        .add("assets/tiles/SE.png")
-        .add("assets/tiles/SW.png")
-        .add("assets/tiles/WE.png")
-        .add("assets/tiles/edge.png")
-        .add("assets/tiles/corner.png")
-        .add("assets/ui/exitpressed.png")
-        .add("assets/ui/exitunpressed.png")
-        .add("assets/ui/resetpressed.png")
-        .add("assets/ui/resetunpressed.png")
-        .add("assets/ui/submitpressed.png")
-        .add("assets/ui/submitunpressed.png")
+        .add("/assets/scene/background.jpeg")
+        .add("/assets/scene/winbackground.jpg")
+        .add("/assets/scene/black.jpg")
+        .add("/assets/objects/bomb.png")
+        .add("/assets/objects/carrot.png")
+        .add("/assets/objects/stone.png")
+        .add("/assets/objects/rabbit.png")
+        .add("/assets/objects/select.png")
+        .add("/assets/objects/x.png")
+        .add("/assets/tiles/E.png")
+        .add("/assets/tiles/NE.png")
+        .add("/assets/tiles/NS.png")
+        .add("/assets/tiles/NW.png")
+        .add("/assets/tiles/SE.png")
+        .add("/assets/tiles/SW.png")
+        .add("/assets/tiles/WE.png")
+        .add("/assets/tiles/edge.png")
+        .add("/assets/tiles/corner.png")
+        .add("/assets/ui/exitpressed.png")
+        .add("/assets/ui/exitunpressed.png")
+        .add("/assets/ui/resetpressed.png")
+        .add("/assets/ui/resetunpressed.png")
+        .add("/assets/ui/submitpressed.png")
+        .add("/assets/ui/submitunpressed.png")
         .load(setup);
 
     function setup() {
         let resources = app.loader.resources;
 
         // Create the background and add it to the stage
-        let background = new PIXI.Sprite(resources["assets/scene/background.jpeg"].texture);
+        let background = new PIXI.Sprite(resources["/assets/scene/background.jpeg"].texture);
         background.width = app.screen.width;
         background.height = app.screen.height;
 
@@ -123,7 +123,7 @@ socket.on('connect', function () {
         for (let row = 0; row < boardHeight; row++) {
             let rowArr = [];
             for (let col = 0; col < boardWidth; col++) {
-                const spr = new PIXI.Sprite(resources["assets/tiles/E.png"].texture);
+                const spr = new PIXI.Sprite(resources["/assets/tiles/E.png"].texture);
                 spr.x = col * 80;
                 spr.y = row * 80;
                 tileContainer.addChild(spr);
@@ -133,10 +133,10 @@ socket.on('connect', function () {
         }
 
 
-        //board[0][0].texture = resources["assets/tiles/NE.png"].texture;
+        //board[0][0].texture = resources["/assets/tiles/NE.png"].texture;
 
         function removeTile(x, y) {
-            board[x][y].texture = resources["assets/tiles/E.png"].texture;
+            board[x][y].texture = resources["/assets/tiles/E.png"].texture;
         }
 
 
@@ -156,7 +156,7 @@ socket.on('connect', function () {
             for (let row = y - 1; row <= y + 1; row++) {
                 for (let col = x - 1; col <= x + 1; col++) {
                     if (row >= 0 && row < boardHeight && col >= 0 && col < boardWidth && bombs[row][col] == undefined && stones[row][col] == undefined && !(row == 0 && col == 0)) {
-                        bombs[row][col] = new PIXI.Sprite(resources["assets/objects/bomb.png"].texture);
+                        bombs[row][col] = new PIXI.Sprite(resources["/assets/objects/bomb.png"].texture);
                         bombs[row][col].x = 80 * col;
                         bombs[row][col].y = 80 * row;
                         bombs[row][col].width = 80;
@@ -195,22 +195,22 @@ socket.on('connect', function () {
         for (let i = 0; i < 200; i++) {
             let choice = Math.floor(Math.random() * 6);
             if (choice == 0) {
-                queue.push(new PIXI.Sprite(resources["assets/tiles/NE.png"].texture));
+                queue.push(new PIXI.Sprite(resources["/assets/tiles/NE.png"].texture));
             }
             else if (choice == 1) {
-                queue.push(new PIXI.Sprite(resources["assets/tiles/NS.png"].texture));
+                queue.push(new PIXI.Sprite(resources["/assets/tiles/NS.png"].texture));
             }
             else if (choice == 2) {
-                queue.push(new PIXI.Sprite(resources["assets/tiles/NW.png"].texture));
+                queue.push(new PIXI.Sprite(resources["/assets/tiles/NW.png"].texture));
             }
             else if (choice == 3) {
-                queue.push(new PIXI.Sprite(resources["assets/tiles/SE.png"].texture));
+                queue.push(new PIXI.Sprite(resources["/assets/tiles/SE.png"].texture));
             }
             else if (choice == 4) {
-                queue.push(new PIXI.Sprite(resources["assets/tiles/SW.png"].texture));
+                queue.push(new PIXI.Sprite(resources["/assets/tiles/SW.png"].texture));
             }
             else if (choice == 5) {
-                queue.push(new PIXI.Sprite(resources["assets/tiles/WE.png"].texture));
+                queue.push(new PIXI.Sprite(resources["/assets/tiles/WE.png"].texture));
             }
         }
 
@@ -285,26 +285,26 @@ socket.on('connect', function () {
 
 
         // GAME BOARD CURSOR ("SELECT")
-        let select = new PIXI.Sprite(resources["assets/objects/x.png"].texture);
+        let select = new PIXI.Sprite(resources["/assets/objects/x.png"].texture);
 
         let isPlaceable = false;
         function updateSelect() {
             let tempX = select.x / 80;
             let tempY = select.y / 80;
-            if (isPlaceable && (board[tempY][tempX]._texture.textureCacheIds[0] != "assets/tiles/E.png" || stones[tempY][tempX] != undefined)) {
+            if (isPlaceable && (board[tempY][tempX]._texture.textureCacheIds[0] != "/assets/tiles/E.png" || stones[tempY][tempX] != undefined)) {
                 isPlaceable = false;
-                select.texture = resources["assets/objects/x.png"].texture
+                select.texture = resources["/assets/objects/x.png"].texture
             }
-            else if (!isPlaceable && (board[tempY][tempX]._texture.textureCacheIds[0] == "assets/tiles/E.png" && stones[tempY][tempX] == undefined)) {
+            else if (!isPlaceable && (board[tempY][tempX]._texture.textureCacheIds[0] == "/assets/tiles/E.png" && stones[tempY][tempX] == undefined)) {
                 isPlaceable = true;
-                select.texture = resources["assets/objects/select.png"].texture
+                select.texture = resources["/assets/objects/select.png"].texture
             }
         }
 
 
 
         // PLAYER
-        const player = new PIXI.Sprite(resources["assets/objects/rabbit.png"].texture);
+        const player = new PIXI.Sprite(resources["/assets/objects/rabbit.png"].texture);
 
         let playerX = 0;
         let playerY = 0;
@@ -345,7 +345,7 @@ socket.on('connect', function () {
         let startTime = 0;
         let infobarContainer = new PIXI.Container();
 
-        let infoCarrot = new PIXI.Sprite(resources["assets/objects/carrot.png"].texture);
+        let infoCarrot = new PIXI.Sprite(resources["/assets/objects/carrot.png"].texture);
         infoCarrot.width = 50;
         infoCarrot.height = 50;
         infobarContainer.addChild(infoCarrot);
@@ -424,7 +424,7 @@ socket.on('connect', function () {
                 let row = select.y / 80;
                 let col = select.x / 80;
 
-                if (board[row][col]._texture.textureCacheIds[0] == "assets/tiles/E.png" && stones[row][col] == undefined) {
+                if (board[row][col]._texture.textureCacheIds[0] == "/assets/tiles/E.png" && stones[row][col] == undefined) {
                     if (startTime == 0) {
                         startTime = Date.now();
                         timerInterval = setInterval(setTime, 1000);
@@ -435,22 +435,22 @@ socket.on('connect', function () {
                     //blocksPlaced++;
 
                     let texture = updateQueue()._texture.textureCacheIds[0];
-                    if (texture == "assets/tiles/NE.png") {
+                    if (texture == "/assets/tiles/NE.png") {
                         socket.emit('place piece', row, col, 'NE');
                     }
-                    else if (texture == "assets/tiles/SE.png") {
+                    else if (texture == "/assets/tiles/SE.png") {
                         socket.emit('place piece', row, col, 'SE');
                     }
-                    else if (texture == "assets/tiles/NW.png") {
+                    else if (texture == "/assets/tiles/NW.png") {
                         socket.emit('place piece', row, col, 'NW');
                     }
-                    else if (texture == "assets/tiles/SW.png") {
+                    else if (texture == "/assets/tiles/SW.png") {
                         socket.emit('place piece', row, col, 'SW');
                     }
-                    else if (texture == "assets/tiles/NS.png") {
+                    else if (texture == "/assets/tiles/NS.png") {
                         socket.emit('place piece', row, col, 'NS');
                     }
-                    else if (texture == "assets/tiles/WE.png") {
+                    else if (texture == "/assets/tiles/WE.png") {
                         socket.emit('place piece', row, col, 'WE');
                     }
                 }
@@ -466,11 +466,11 @@ socket.on('connect', function () {
 
 
         //board edge
-        let edgeContainer = boardEdges(resources["assets/tiles/corner.png"].texture, resources["assets/tiles/edge.png"].texture, boardHeight, boardWidth, queueX, queueY);
+        let edgeContainer = boardEdges(resources["/assets/tiles/corner.png"].texture, resources["/assets/tiles/edge.png"].texture, boardHeight, boardWidth, queueX, queueY);
 
 
         // queue edge
-        let queueEdgeContainer = queueEdges(resources["assets/tiles/corner.png"].texture, resources["assets/tiles/edge.png"].texture, boardHeight, boardWidth, queueX, queueY);
+        let queueEdgeContainer = queueEdges(resources["/assets/tiles/corner.png"].texture, resources["/assets/tiles/edge.png"].texture, boardHeight, boardWidth, queueX, queueY);
 
 
 
@@ -501,10 +501,10 @@ socket.on('connect', function () {
             console.log('board received');
             for (let row = 0; row < boardHeight; row++) {
                 for (let col = 0; col < boardWidth; col++) {
-                    board[row][col].texture = resources['assets/tiles/' + myboard[row][col] + '.png'].texture;
+                    board[row][col].texture = resources['/assets/tiles/' + myboard[row][col] + '.png'].texture;
 
                     if (mycarrots[row][col] && carrots[row][col] == undefined) {
-                        carrots[row][col] = new PIXI.Sprite(resources["assets/objects/carrot.png"].texture);
+                        carrots[row][col] = new PIXI.Sprite(resources["/assets/objects/carrot.png"].texture);
                         carrots[row][col].x = col * 80 + 20;
                         carrots[row][col].y = row * 80 + 20;
                         carrotContainer.addChild(carrots[row][col])
@@ -515,7 +515,7 @@ socket.on('connect', function () {
                     }
 
                     if (mystones[row][col] && stones[row][col] == undefined) {
-                        stones[row][col] = new PIXI.Sprite(resources["assets/objects/stone.png"].texture);
+                        stones[row][col] = new PIXI.Sprite(resources["/assets/objects/stone.png"].texture);
                         stones[row][col].x = col * 80;
                         stones[row][col].y = row * 80;
                         stoneContainer.addChild(stones[row][col])

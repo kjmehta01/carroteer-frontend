@@ -34,37 +34,37 @@ let app = new PIXI.Application({
 document.body.appendChild(app.view);
 
 app.loader
-    .add("assets/scene/background.jpeg")
-    .add("assets/scene/winbackground.jpg")
-    .add("assets/scene/black.jpg")
-    .add("assets/objects/bomb.png")
-    .add("assets/objects/carrot.png")
-    .add("assets/objects/stone.png")
-    .add("assets/objects/rabbit.png")
-    .add("assets/objects/select.png")
-    .add("assets/objects/x.png")
-    .add("assets/tiles/EMPTY.png")
-    .add("assets/tiles/NE.png")
-    .add("assets/tiles/NS.png")
-    .add("assets/tiles/NW.png")
-    .add("assets/tiles/SE.png")
-    .add("assets/tiles/SW.png")
-    .add("assets/tiles/WE.png")
-    .add("assets/tiles/edge.png")
-    .add("assets/tiles/corner.png")
-    .add("assets/ui/exitpressed.png")
-    .add("assets/ui/exitunpressed.png")
-    .add("assets/ui/resetpressed.png")
-    .add("assets/ui/resetunpressed.png")
-    .add("assets/ui/submitpressed.png")
-    .add("assets/ui/submitunpressed.png")
+    .add("/assets/scene/background.jpeg")
+    .add("/assets/scene/winbackground.jpg")
+    .add("/assets/scene/black.jpg")
+    .add("/assets/objects/bomb.png")
+    .add("/assets/objects/carrot.png")
+    .add("/assets/objects/stone.png")
+    .add("/assets/objects/rabbit.png")
+    .add("/assets/objects/select.png")
+    .add("/assets/objects/x.png")
+    .add("/assets/tiles/EMPTY.png")
+    .add("/assets/tiles/NE.png")
+    .add("/assets/tiles/NS.png")
+    .add("/assets/tiles/NW.png")
+    .add("/assets/tiles/SE.png")
+    .add("/assets/tiles/SW.png")
+    .add("/assets/tiles/WE.png")
+    .add("/assets/tiles/edge.png")
+    .add("/assets/tiles/corner.png")
+    .add("/assets/ui/exitpressed.png")
+    .add("/assets/ui/exitunpressed.png")
+    .add("/assets/ui/resetpressed.png")
+    .add("/assets/ui/resetunpressed.png")
+    .add("/assets/ui/submitpressed.png")
+    .add("/assets/ui/submitunpressed.png")
     .load(setup);
 
 function setup() {
     let resources = app.loader.resources;
 
     // Create the background and add it to the stage
-    let background = new PIXI.Sprite(resources["assets/scene/background.jpeg"].texture);
+    let background = new PIXI.Sprite(resources["/assets/scene/background.jpeg"].texture);
     background.width = app.screen.width;
     background.height = app.screen.height;
 
@@ -113,7 +113,7 @@ function setup() {
     for (let row = 0; row < boardHeight; row++) {
         let rowArr = [];
         for (let col = 0; col < boardWidth; col++) {
-            const spr = new PIXI.Sprite(resources["assets/tiles/EMPTY.png"].texture);
+            const spr = new PIXI.Sprite(resources["/assets/tiles/EMPTY.png"].texture);
             spr.x = col * 80;
             spr.y = row * 80;
             tileContainer.addChild(spr);
@@ -123,10 +123,10 @@ function setup() {
     }
 
 
-    board[0][0].texture = resources["assets/tiles/NE.png"].texture;
+    board[0][0].texture = resources["/assets/tiles/NE.png"].texture;
 
     function removeTile(x, y) {
-        board[x][y].texture = resources["assets/tiles/EMPTY.png"].texture;
+        board[x][y].texture = resources["/assets/tiles/EMPTY.png"].texture;
     }
 
 
@@ -146,7 +146,7 @@ function setup() {
         for (let row = y - 1; row <= y + 1; row++) {
             for (let col = x - 1; col <= x + 1; col++) {
                 if (row >= 0 && row < boardHeight && col >= 0 && col < boardWidth && bombs[row][col] == undefined && stones[row][col] == undefined && !(row == 0 && col == 0)) {
-                    bombs[row][col] = new PIXI.Sprite(resources["assets/objects/bomb.png"].texture);
+                    bombs[row][col] = new PIXI.Sprite(resources["/assets/objects/bomb.png"].texture);
                     bombs[row][col].x = 80 * col;
                     bombs[row][col].y = 80 * row;
                     bombs[row][col].width = 80;
@@ -185,22 +185,22 @@ function setup() {
     for (let i = 0; i < 200; i++) {
         let choice = Math.floor(Math.random() * 6);
         if (choice == 0) {
-            queue.push(new PIXI.Sprite(resources["assets/tiles/NE.png"].texture));
+            queue.push(new PIXI.Sprite(resources["/assets/tiles/NE.png"].texture));
         }
         else if (choice == 1) {
-            queue.push(new PIXI.Sprite(resources["assets/tiles/NS.png"].texture));
+            queue.push(new PIXI.Sprite(resources["/assets/tiles/NS.png"].texture));
         }
         else if (choice == 2) {
-            queue.push(new PIXI.Sprite(resources["assets/tiles/NW.png"].texture));
+            queue.push(new PIXI.Sprite(resources["/assets/tiles/NW.png"].texture));
         }
         else if (choice == 3) {
-            queue.push(new PIXI.Sprite(resources["assets/tiles/SE.png"].texture));
+            queue.push(new PIXI.Sprite(resources["/assets/tiles/SE.png"].texture));
         }
         else if (choice == 4) {
-            queue.push(new PIXI.Sprite(resources["assets/tiles/SW.png"].texture));
+            queue.push(new PIXI.Sprite(resources["/assets/tiles/SW.png"].texture));
         }
         else if (choice == 5) {
-            queue.push(new PIXI.Sprite(resources["assets/tiles/WE.png"].texture));
+            queue.push(new PIXI.Sprite(resources["/assets/tiles/WE.png"].texture));
         }
     }
 
@@ -269,7 +269,7 @@ function setup() {
             }
         } while (duplicate);
 
-        carrots[ytemp][xtemp] = new PIXI.Sprite(resources["assets/objects/carrot.png"].texture);
+        carrots[ytemp][xtemp] = new PIXI.Sprite(resources["/assets/objects/carrot.png"].texture);
         carrots[ytemp][xtemp].x = xtemp * 80 + 20;
         carrots[ytemp][xtemp].y = ytemp * 80 + 20;
         carrotContainer.addChild(carrots[ytemp][xtemp])
@@ -305,7 +305,7 @@ function setup() {
             }
         } while (duplicate);
 
-        stones[ytemp][xtemp] = new PIXI.Sprite(resources["assets/objects/stone.png"].texture);
+        stones[ytemp][xtemp] = new PIXI.Sprite(resources["/assets/objects/stone.png"].texture);
         stones[ytemp][xtemp].x = xtemp * 80;
         stones[ytemp][xtemp].y = ytemp * 80;
         stoneContainer.addChild(stones[ytemp][xtemp])
@@ -315,26 +315,26 @@ function setup() {
 
 
     // GAME BOARD CURSOR ("SELECT")
-    let select = new PIXI.Sprite(resources["assets/objects/x.png"].texture);
+    let select = new PIXI.Sprite(resources["/assets/objects/x.png"].texture);
 
     let isPlaceable = false;
     function updateSelect() {
         let tempX = select.x / 80;
         let tempY = select.y / 80;
-        if (isPlaceable && (board[tempY][tempX]._texture.textureCacheIds[0] != "assets/tiles/EMPTY.png" || stones[tempY][tempX] != undefined)) {
+        if (isPlaceable && (board[tempY][tempX]._texture.textureCacheIds[0] != "/assets/tiles/EMPTY.png" || stones[tempY][tempX] != undefined)) {
             isPlaceable = false;
-            select.texture = resources["assets/objects/x.png"].texture
+            select.texture = resources["/assets/objects/x.png"].texture
         }
-        else if (!isPlaceable && (board[tempY][tempX]._texture.textureCacheIds[0] == "assets/tiles/EMPTY.png" && stones[tempY][tempX] == undefined)) {
+        else if (!isPlaceable && (board[tempY][tempX]._texture.textureCacheIds[0] == "/assets/tiles/EMPTY.png" && stones[tempY][tempX] == undefined)) {
             isPlaceable = true;
-            select.texture = resources["assets/objects/select.png"].texture
+            select.texture = resources["/assets/objects/select.png"].texture
         }
     }
 
 
 
     // PLAYER
-    const player = new PIXI.Sprite(resources["assets/objects/rabbit.png"].texture);
+    const player = new PIXI.Sprite(resources["/assets/objects/rabbit.png"].texture);
 
 
     let playerX = 0;
@@ -395,52 +395,52 @@ function setup() {
                     isWaiting = false;
                     if (playerDirection == 'E') {
                         if (playerX + 1 < boardWidth) {
-                            if (board[playerY][playerX + 1]._texture.textureCacheIds[0] == "assets/tiles/NW.png") {
+                            if (board[playerY][playerX + 1]._texture.textureCacheIds[0] == "/assets/tiles/NW.png") {
                                 overAndOver(1, 0, 'N');
                             }
-                            else if (board[playerY][playerX + 1]._texture.textureCacheIds[0] == "assets/tiles/SW.png") {
+                            else if (board[playerY][playerX + 1]._texture.textureCacheIds[0] == "/assets/tiles/SW.png") {
                                 overAndOver(1, 0, 'S');
                             }
-                            else if (board[playerY][playerX + 1]._texture.textureCacheIds[0] == "assets/tiles/WE.png") {
+                            else if (board[playerY][playerX + 1]._texture.textureCacheIds[0] == "/assets/tiles/WE.png") {
                                 overAndOver(1, 0, 'E');
                             }
                         }
                     }
                     else if (playerDirection == 'N') {
                         if (playerY - 1 >= 0) {
-                            if (board[playerY - 1][playerX]._texture.textureCacheIds[0] == "assets/tiles/SW.png") {
+                            if (board[playerY - 1][playerX]._texture.textureCacheIds[0] == "/assets/tiles/SW.png") {
                                 overAndOver(0, -1, 'W');
                             }
-                            else if (board[playerY - 1][playerX]._texture.textureCacheIds[0] == "assets/tiles/SE.png") {
+                            else if (board[playerY - 1][playerX]._texture.textureCacheIds[0] == "/assets/tiles/SE.png") {
                                 overAndOver(0, -1, 'E');
                             }
-                            else if (board[playerY - 1][playerX]._texture.textureCacheIds[0] == "assets/tiles/NS.png") {
+                            else if (board[playerY - 1][playerX]._texture.textureCacheIds[0] == "/assets/tiles/NS.png") {
                                 overAndOver(0, -1, 'N');
                             }
                         }
                     }
                     else if (playerDirection == 'W') {
                         if (playerX - 1 >= 0) {
-                            if (board[playerY][playerX - 1]._texture.textureCacheIds[0] == "assets/tiles/NE.png") {
+                            if (board[playerY][playerX - 1]._texture.textureCacheIds[0] == "/assets/tiles/NE.png") {
                                 overAndOver(-1, 0, 'N');
                             }
-                            else if (board[playerY][playerX - 1]._texture.textureCacheIds[0] == "assets/tiles/SE.png") {
+                            else if (board[playerY][playerX - 1]._texture.textureCacheIds[0] == "/assets/tiles/SE.png") {
                                 overAndOver(-1, 0, 'S');
                             }
-                            else if (board[playerY][playerX - 1]._texture.textureCacheIds[0] == "assets/tiles/WE.png") {
+                            else if (board[playerY][playerX - 1]._texture.textureCacheIds[0] == "/assets/tiles/WE.png") {
                                 overAndOver(-1, 0, 'W');
                             }
                         }
                     }
                     else if (playerDirection == 'S') {
                         if (playerY + 1 < boardHeight) {
-                            if (board[playerY + 1][playerX]._texture.textureCacheIds[0] == "assets/tiles/NE.png") {
+                            if (board[playerY + 1][playerX]._texture.textureCacheIds[0] == "/assets/tiles/NE.png") {
                                 overAndOver(0, 1, 'E');
                             }
-                            else if (board[playerY + 1][playerX]._texture.textureCacheIds[0] == "assets/tiles/NW.png") {
+                            else if (board[playerY + 1][playerX]._texture.textureCacheIds[0] == "/assets/tiles/NW.png") {
                                 overAndOver(0, 1, 'W');
                             }
-                            else if (board[playerY + 1][playerX]._texture.textureCacheIds[0] == "assets/tiles/NS.png") {
+                            else if (board[playerY + 1][playerX]._texture.textureCacheIds[0] == "/assets/tiles/NS.png") {
                                 overAndOver(0, 1, 'S');
                             }
                         }
@@ -461,7 +461,7 @@ function setup() {
     let startTime = 0;
     let infobarContainer = new PIXI.Container();
 
-    let infoCarrot = new PIXI.Sprite(resources["assets/objects/carrot.png"].texture);
+    let infoCarrot = new PIXI.Sprite(resources["/assets/objects/carrot.png"].texture);
     infoCarrot.width = 50;
     infoCarrot.height = 50;
     infobarContainer.addChild(infoCarrot);
@@ -498,7 +498,7 @@ function setup() {
     // WIN SCREEN
     let blackLayer = new PIXI.Container();
 
-    let blackSprite = new PIXI.Sprite(resources['assets/scene/black.jpg'].texture);
+    let blackSprite = new PIXI.Sprite(resources['/assets/scene/black.jpg'].texture);
     blackSprite.alpha = 0.8;
 
     blackLayer.addChild(blackSprite);
@@ -509,7 +509,7 @@ function setup() {
     let margConst = 50;
 
 
-    let outerBox = new PIXI.Sprite(resources['assets/scene/winbackground.jpg'].texture);
+    let outerBox = new PIXI.Sprite(resources['/assets/scene/winbackground.jpg'].texture);
     outerBox.width = 1100;
     outerBox.height = 550;
     winScreenContainer.addChild(outerBox);
@@ -522,7 +522,7 @@ function setup() {
     winScreenContainer.addChild(winText);
 
 
-    let resetButton = new PIXI.Sprite(resources["assets/ui/resetunpressed.png"].texture);
+    let resetButton = new PIXI.Sprite(resources["/assets/ui/resetunpressed.png"].texture);
     resetButton.height = 100;
     resetButton.length = 100;
     resetButton.x = winScreenContainer.width / 2 - resetButton.width - margConst;
@@ -535,10 +535,10 @@ function setup() {
     resetButton.on('click', resetButtonClick);
 
     function resetButtonMouseover() {
-        resetButton.texture = resources["assets/ui/resetpressed.png"].texture;
+        resetButton.texture = resources["/assets/ui/resetpressed.png"].texture;
     }
     function resetButtonMouseout() {
-        resetButton.texture = resources["assets/ui/resetunpressed.png"].texture;
+        resetButton.texture = resources["/assets/ui/resetunpressed.png"].texture;
     }
     function resetButtonClick() {
         window.location.reload();
@@ -546,7 +546,7 @@ function setup() {
     winScreenContainer.addChild(resetButton);
 
 
-    let exitButton = new PIXI.Sprite(resources["assets/ui/exitunpressed.png"].texture);
+    let exitButton = new PIXI.Sprite(resources["/assets/ui/exitunpressed.png"].texture);
     exitButton.height = 100;
     exitButton.length = 100;
     exitButton.x = winScreenContainer.width / 2 - exitButton.width * 3 - margConst;
@@ -559,10 +559,10 @@ function setup() {
     exitButton.on('click', exitButtonClick);
 
     function exitButtonMouseover() {
-        exitButton.texture = resources["assets/ui/exitpressed.png"].texture;
+        exitButton.texture = resources["/assets/ui/exitpressed.png"].texture;
     }
     function exitButtonMouseout() {
-        exitButton.texture = resources["assets/ui/exitunpressed.png"].texture;
+        exitButton.texture = resources["/assets/ui/exitunpressed.png"].texture;
     }
     function exitButtonClick() {
         location.href = '/';
@@ -615,7 +615,7 @@ function setup() {
                 input.y = 430;
                 winScreenContainer.addChild(input);
 
-                let submitButton = new PIXI.Sprite(resources["assets/ui/submitunpressed.png"].texture);
+                let submitButton = new PIXI.Sprite(resources["/assets/ui/submitunpressed.png"].texture);
                 submitButton.height = 50;
                 submitButton.width = 50;
                 submitButton.x = winScreenContainer.width / 2 + 300;
@@ -628,10 +628,10 @@ function setup() {
                 submitButton.on('click', submitButtonClick);
 
                 function submitButtonMouseover() {
-                    submitButton.texture = resources["assets/ui/submitpressed.png"].texture;
+                    submitButton.texture = resources["/assets/ui/submitpressed.png"].texture;
                 }
                 function submitButtonMouseout() {
-                    submitButton.texture = resources["assets/ui/submitunpressed.png"].texture;
+                    submitButton.texture = resources["/assets/ui/submitunpressed.png"].texture;
                 }
                 function submitButtonClick() {
                     if (input.text != "") {
@@ -770,7 +770,7 @@ function setup() {
             let row = select.y / 80;
             let col = select.x / 80;
 
-            if (board[row][col]._texture.textureCacheIds[0] == "assets/tiles/EMPTY.png" && stones[row][col] == undefined) {
+            if (board[row][col]._texture.textureCacheIds[0] == "/assets/tiles/EMPTY.png" && stones[row][col] == undefined) {
                 if (startTime == 0) {
                     startTime = Date.now();
                     timerInterval = setInterval(setTime, 1000);
@@ -795,11 +795,11 @@ function setup() {
 
 
     //board edge
-    let edgeContainer = boardEdges(resources["assets/tiles/corner.png"].texture, resources["assets/tiles/edge.png"].texture, boardHeight, boardWidth, queueX, queueY);
+    let edgeContainer = boardEdges(resources["/assets/tiles/corner.png"].texture, resources["/assets/tiles/edge.png"].texture, boardHeight, boardWidth, queueX, queueY);
 
 
     // queue edge
-    let queueEdgeContainer = queueEdges(resources["assets/tiles/corner.png"].texture, resources["assets/tiles/edge.png"].texture, boardHeight, boardWidth, queueX, queueY);
+    let queueEdgeContainer = queueEdges(resources["/assets/tiles/corner.png"].texture, resources["/assets/tiles/edge.png"].texture, boardHeight, boardWidth, queueX, queueY);
 
 
 
