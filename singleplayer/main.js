@@ -43,7 +43,7 @@ app.loader
     .add("/assets/objects/rabbit.png")
     .add("/assets/objects/select.png")
     .add("/assets/objects/x.png")
-    .add("/assets/tiles/EMPTY.png")
+    .add("/assets/tiles/E.png")
     .add("/assets/tiles/NE.png")
     .add("/assets/tiles/NS.png")
     .add("/assets/tiles/NW.png")
@@ -113,7 +113,7 @@ function setup() {
     for (let row = 0; row < boardHeight; row++) {
         let rowArr = [];
         for (let col = 0; col < boardWidth; col++) {
-            const spr = new PIXI.Sprite(resources["/assets/tiles/EMPTY.png"].texture);
+            const spr = new PIXI.Sprite(resources["/assets/tiles/E.png"].texture);
             spr.x = col * 80;
             spr.y = row * 80;
             tileContainer.addChild(spr);
@@ -126,7 +126,7 @@ function setup() {
     board[0][0].texture = resources["/assets/tiles/NE.png"].texture;
 
     function removeTile(x, y) {
-        board[x][y].texture = resources["/assets/tiles/EMPTY.png"].texture;
+        board[x][y].texture = resources["/assets/tiles/E.png"].texture;
     }
 
 
@@ -321,11 +321,11 @@ function setup() {
     function updateSelect() {
         let tempX = select.x / 80;
         let tempY = select.y / 80;
-        if (isPlaceable && (board[tempY][tempX]._texture.textureCacheIds[0] != "/assets/tiles/EMPTY.png" || stones[tempY][tempX] != undefined)) {
+        if (isPlaceable && (board[tempY][tempX]._texture.textureCacheIds[0] != "/assets/tiles/E.png" || stones[tempY][tempX] != undefined)) {
             isPlaceable = false;
             select.texture = resources["/assets/objects/x.png"].texture
         }
-        else if (!isPlaceable && (board[tempY][tempX]._texture.textureCacheIds[0] == "/assets/tiles/EMPTY.png" && stones[tempY][tempX] == undefined)) {
+        else if (!isPlaceable && (board[tempY][tempX]._texture.textureCacheIds[0] == "/assets/tiles/E.png" && stones[tempY][tempX] == undefined)) {
             isPlaceable = true;
             select.texture = resources["/assets/objects/select.png"].texture
         }
@@ -770,7 +770,7 @@ function setup() {
             let row = select.y / 80;
             let col = select.x / 80;
 
-            if (board[row][col]._texture.textureCacheIds[0] == "/assets/tiles/EMPTY.png" && stones[row][col] == undefined) {
+            if (board[row][col]._texture.textureCacheIds[0] == "/assets/tiles/E.png" && stones[row][col] == undefined) {
                 if (startTime == 0) {
                     startTime = Date.now();
                     timerInterval = setInterval(setTime, 1000);

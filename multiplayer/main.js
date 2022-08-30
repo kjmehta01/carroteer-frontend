@@ -304,14 +304,21 @@ socket.on('connect', function () {
 
 
         // PLAYER
-        const player = new PIXI.Sprite(resources["/assets/objects/rabbit.png"].texture);
+        const player1 = new PIXI.Sprite(resources["/assets/objects/rabbit.png"].texture);
 
-        let playerX = 0;
-        let playerY = 0;
-        let playerDirection = 'E';
-        setPlayerPosition();
+        let player1X = 0;
+        let player1Y = 0;
+        let player1Direction = 'E';
+        setPlayerPosition(player1, player1X, player1Y, player1Direction);
 
-        function setPlayerPosition() {
+        const player2 = new PIXI.Sprite(resources["/assets/objects/rabbit.png"].texture);
+
+        let player2X = boardWidth - 1;
+        let player2Y = boardHeight - 1;
+        let player2Direction = 'W';
+        setPlayerPosition(player2, player2X, player2Y, player2Direction);
+
+        function setPlayerPosition(player, playerX, playerY, playerDirection) {
             if (playerDirection == 'E') {
                 player.rotation = Math.PI / 2;
                 player.x = 80 * playerX + 60;
@@ -479,7 +486,8 @@ socket.on('connect', function () {
         boardContainer.addChild(tileContainer);
         boardContainer.addChild(carrotContainer);
         boardContainer.addChild(stoneContainer);
-        boardContainer.addChild(player);
+        boardContainer.addChild(player1);
+        boardContainer.addChild(player2);
         boardContainer.addChild(bombsContainer);
         boardContainer.addChild(select);
         boardContainer.addChild(edgeContainer);
@@ -527,11 +535,15 @@ socket.on('connect', function () {
                 }
             }
 
-            playerX = p1x;
-            playerY = p1y;
-            playerDirection = p1dir;
+            player1X = p1x;
+            player1Y = p1y;
+            player1Direction = p1dir;
+            player2X = p2x;
+            player2Y = p2y;
+            player2Direction = p2dir;
             carrotCount = p1count;
-            //updatePlayerCoords();
+            setPlayerPosition(player1, player1X, player1Y, player1Direction);
+            setPlayerPosition(player2, player2X, player2Y, player2Direction);
             updateSelect();
         });
 
