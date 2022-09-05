@@ -10,23 +10,20 @@ WebFont.load({
 const url = 'http://localhost:5000';
 //const url = 'https://carroteer-backend.herokuapp.com';
 
-const boardWidth = 5;
+const boardWidth = 8;
 const boardHeight = 8;
 //const boardX = 200;
 const boardY = 150;
-const boardX = window.innerWidth / 2 - (boardWidth * 80 / 2);
+const boardX = window.innerWidth / 2 - (boardWidth * 80 / 2) - 50;
 
 const queueX = boardX - 120;
 const queueY = 200;
 
-const infobarX = boardX;
-const infobarY = 50;
-
 const bombDuration = 2000;
-const hopSpeed = 1000;
-const numStones = 5;
-const numCarrots = 5;
 
+let p1p2 = 'p2';
+let frozen = false;
+let started = false;
 
 //multiplayer setup
 const socket = io.connect(url, {
@@ -35,11 +32,6 @@ const socket = io.connect(url, {
 
 socket.on('connect', function () {
     console.log("socket connected");
-
-    /*socket.on('test', () => {
-        console.log('test');
-    });*/
-
 
 
     let app = new PIXI.Application({
@@ -66,6 +58,9 @@ socket.on('connect', function () {
         .add("/assets/tiles/SE.png")
         .add("/assets/tiles/SW.png")
         .add("/assets/tiles/WE.png")
+        .add("/assets/tiles/red.png")
+        .add("/assets/tiles/blue.png")
+        .add("/assets/tiles/purple.png")
         .add("/assets/tiles/edge.png")
         .add("/assets/tiles/corner.png")
         .add("/assets/ui/exitpressed.png")
@@ -94,19 +89,20 @@ socket.on('connect', function () {
                 isResizing = true;
                 setTimeout(function () {
                     isResizing = false;
-                    // Resize the renderer
                     app.renderer.resize(window.innerWidth, window.innerHeight);
 
-                    // You can use the 'screen' property as the renderer visible
-                    // area, this is more useful than view.width/height because
-                    // it handles resolution
                     background.width = app.screen.width;
                     background.height = app.screen.height;
 
                     boardContainer.x = window.innerWidth / 2 - (boardWidth * 80 / 2);
+
                     infobarContainer.x = boardContainer.x;
+
                     queueContainer.x = boardContainer.x - 120;
-                }, 250);
+
+                    p1BarContainer.x = boardContainer.x + 80 * boardWidth + 25;
+                    p2BarContainer.x = boardContainer.x + 80 * boardWidth + 25;
+                }, 100);
             }
         }
 
@@ -133,7 +129,8 @@ socket.on('connect', function () {
         }
 
 
-        //board[0][0].texture = resources["/assets/tiles/NE.png"].texture;
+        board[0][0].texture = resources["/assets/tiles/NE.png"].texture;
+        board[boardHeight - 1][boardWidth - 1].texture = resources["/assets/tiles/SW.png"].texture;
 
         function removeTile(x, y) {
             board[x][y].texture = resources["/assets/tiles/E.png"].texture;
@@ -230,6 +227,9 @@ socket.on('connect', function () {
         queue[3].y = 280;
         queueContainer.addChild(queue[3]);
 
+        function viewQueue() {
+            return queue[0];
+        }
 
         function updateQueue() {
             queueContainer.removeChild(queue[0]);
@@ -265,7 +265,8 @@ socket.on('connect', function () {
             }
         }
 
-        let carrotCount = 0;
+        let p1CarrotCount = 0;
+        let p2CarrotCount = 0;
 
 
 
@@ -286,16 +287,18 @@ socket.on('connect', function () {
 
         // GAME BOARD CURSOR ("SELECT")
         let select = new PIXI.Sprite(resources["/assets/objects/x.png"].texture);
+        select.x = boardWidth * 80 - 80;
+        select.y = boardHeight * 80 - 80;
 
         let isPlaceable = false;
         function updateSelect() {
             let tempX = select.x / 80;
             let tempY = select.y / 80;
-            if (isPlaceable && (board[tempY][tempX]._texture.textureCacheIds[0] != "/assets/tiles/E.png" || stones[tempY][tempX] != undefined)) {
+            if (isPlaceable && (board[tempY][tempX]._texture.textureCacheIds[0] != "/assets/tiles/E.png" || stones[tempY][tempX] != undefined || haze[tempY][tempX] != undefined)) {
                 isPlaceable = false;
                 select.texture = resources["/assets/objects/x.png"].texture
             }
-            else if (!isPlaceable && (board[tempY][tempX]._texture.textureCacheIds[0] == "/assets/tiles/E.png" && stones[tempY][tempX] == undefined)) {
+            else if (!isPlaceable && (board[tempY][tempX]._texture.textureCacheIds[0] == "/assets/tiles/E.png" && stones[tempY][tempX] == undefined && haze[tempY][tempX] == undefined)) {
                 isPlaceable = true;
                 select.texture = resources["/assets/objects/select.png"].texture
             }
@@ -352,18 +355,7 @@ socket.on('connect', function () {
         let startTime = 0;
         let infobarContainer = new PIXI.Container();
 
-        let infoCarrot = new PIXI.Sprite(resources["/assets/objects/carrot.png"].texture);
-        infoCarrot.width = 50;
-        infoCarrot.height = 50;
-        infobarContainer.addChild(infoCarrot);
-
-        let carrotText = new PIXI.Text(carrotCount, { fontFamily: ['DynaPuff'], fontSize: 56, fill: 0x444444, align: 'center' });
-        carrotText.x = 50;
-        infobarContainer.addChild(carrotText);
-
-
         let timer = new PIXI.Text("0:00", { fontFamily: ['DynaPuff'], fontSize: 56, fill: 0x444444, align: 'center' });
-        timer.x = boardWidth * 80 - timer.width;
 
         function setTime() {
             if (startTime != 0) {
@@ -371,7 +363,6 @@ socket.on('connect', function () {
                 let mins = Math.floor(elapsed / 60);
                 let secs = String(Math.round(elapsed % 60)).padStart(2, '0');
                 timer.text = mins + ":" + secs;
-                timer.x = boardWidth * 80 - timer.width;
             }
         }
 
@@ -382,6 +373,153 @@ socket.on('connect', function () {
         infobarContainer.x = boardX;
         infobarContainer.y = boardY - infobarContainer.height - 30;
 
+        // PLAYER 1 Bar
+        let p1BarContainer = new PIXI.Container();
+
+        let p1Text = new PIXI.Text("Player 1", { fontFamily: ['DynaPuff'], fontSize: 36, fill: 0x444444, align: 'center' });
+        p1BarContainer.addChild(p1Text);
+
+        let infoCarrot = new PIXI.Sprite(resources["/assets/objects/carrot.png"].texture);
+        infoCarrot.width = 30;
+        infoCarrot.height = 30;
+        infoCarrot.y = p1Text.height;
+        p1BarContainer.addChild(infoCarrot);
+
+        let carrotText1 = new PIXI.Text(p1CarrotCount, { fontFamily: ['DynaPuff'], fontSize: 36, fill: 0x444444, align: 'center' });
+        carrotText1.x = 30;
+        carrotText1.y = p1Text.height - 6;
+        p1BarContainer.addChild(carrotText1);
+
+        p1BarContainer.x = boardX + 80 * boardWidth + 25;
+        p1BarContainer.y = boardY;
+
+        // PLAYER 2 Bar
+        let p2BarContainer = new PIXI.Container();
+
+        let p2Text = new PIXI.Text("Player 2", { fontFamily: ['DynaPuff'], fontSize: 36, fill: 0x444444, align: 'center' });
+        p2BarContainer.addChild(p2Text);
+
+        let info2Carrot = new PIXI.Sprite(resources["/assets/objects/carrot.png"].texture);
+        info2Carrot.width = 30;
+        info2Carrot.height = 30;
+        info2Carrot.y = p2Text.height;
+        p2BarContainer.addChild(info2Carrot);
+
+        let carrotText2 = new PIXI.Text(p2CarrotCount, { fontFamily: ['DynaPuff'], fontSize: 36, fill: 0x444444, align: 'center' });
+        carrotText2.x = 30;
+        carrotText2.y = p2Text.height - 6;
+        p2BarContainer.addChild(carrotText2);
+
+        p2BarContainer.x = boardX + 80 * boardWidth + 25;
+        p2BarContainer.y = boardY + 80 * boardHeight - p2BarContainer.height;
+
+
+
+        // HAZE
+        let hazeContainer = new PIXI.Container();
+
+        let haze;
+        function initializeHaze(p1p2) {
+            console.log(p1p2);
+            haze = [];
+            for (let row = 0; row < boardHeight; row++) {
+                let rowArr = [];
+                for (let col = 0; col < boardWidth; col++) {
+                    if (p1p2 == 'p2' && row < boardHeight / 2) {
+                        let spr = new PIXI.Sprite(resources["/assets/tiles/red.png"].texture);
+                        spr.alpha = 0.5;
+                        spr.x = col * 80;
+                        spr.y = row * 80;
+                        hazeContainer.addChild(spr);
+                        rowArr.push(spr);
+                    }
+                    else if (p1p2 == 'p1' && row >= boardHeight / 2) {
+                        let spr = new PIXI.Sprite(resources["/assets/tiles/red.png"].texture);
+                        spr.alpha = 0.5;
+                        spr.x = col * 80;
+                        spr.y = row * 80;
+                        hazeContainer.addChild(spr);
+                        rowArr.push(spr);
+                    }
+                    else {
+                        rowArr.push(undefined);
+                    }
+                }
+                haze.push(rowArr);
+            }
+        }
+
+        function updateHaze(p1p2) {
+            for (let row = 0; row < boardHeight; row++) {
+                for (let col = 0; col < boardWidth; col++) {
+                    if (p1p2 == 'p2') {
+                        // opponent is on tile
+                        if (player1X == col && player1Y == row) {
+                            makeRed(row, col)
+                        }
+                        // you are near tile
+                        else if (Math.abs(player2X - col) < 2 && Math.abs(player2Y - row) < 2) {
+                            makeClear(row, col)
+                        }
+                        // they are near tile
+                        else if (Math.abs(player1X - col) < 2 && Math.abs(player1Y - row) < 2) {
+                            makeRed(row, col)
+                        }
+                        // their half
+                        else if (row < boardHeight / 2) {
+                            makeRed(row, col)
+                        }
+                        // your half
+                        else {
+                            makeClear(row, col)
+                        }
+                    }
+                    else if (p1p2 == 'p1') {
+                        // opponent is on tile
+                        if (player2X == col && player2Y == row) {
+                            makeRed(row, col)
+                        }
+                        // you are near tile
+                        else if (Math.abs(player1X - col < 2) && Math.abs(player1Y - row) < 2) {
+                            makeClear(row, col)
+                        }
+                        // they are near tile
+                        else if (Math.abs(player2X - col < 2) && Math.abs(player2Y - row) < 2) {
+                            makeRed(row, col)
+                        }
+                        // their half
+                        else if (row >= boardHeight / 2) {
+                            makeRed(row, col)
+                        }
+                        // your half
+                        else {
+                            makeClear(row, col)
+                        }
+                    }
+                    else {
+                        console.log('api call error, neither p1 nor p2?')
+                    }
+                }
+            }
+        }
+
+        function makeRed(row, col) {
+            if (haze[row][col] == undefined) {
+                let spr = new PIXI.Sprite(resources["/assets/tiles/red.png"].texture);
+                spr.alpha = 0.5;
+                spr.x = col * 80;
+                spr.y = row * 80;
+                hazeContainer.addChild(spr);
+                haze[row][col] = spr;
+            }
+        }
+
+        function makeClear(row, col) {
+            if (haze[row][col] != undefined) {
+                hazeContainer.removeChild(haze[row][col]);
+                haze[row][col] = undefined;
+            }
+        }
 
 
 
@@ -431,17 +569,12 @@ socket.on('connect', function () {
                 let row = select.y / 80;
                 let col = select.x / 80;
 
-                if (board[row][col]._texture.textureCacheIds[0] == "/assets/tiles/E.png" && stones[row][col] == undefined) {
-                    if (startTime == 0) {
-                        startTime = Date.now();
-                        timerInterval = setInterval(setTime, 1000);
-                    }
-
+                if (board[row][col]._texture.textureCacheIds[0] == "/assets/tiles/E.png" && stones[row][col] == undefined && haze[row][col] == undefined && !frozen) {
                     //board[row][col].texture = updateQueue().texture;
 
                     //blocksPlaced++;
 
-                    let texture = updateQueue()._texture.textureCacheIds[0];
+                    let texture = viewQueue()._texture.textureCacheIds[0];
                     if (texture == "/assets/tiles/NE.png") {
                         socket.emit('place piece', row, col, 'NE');
                     }
@@ -460,6 +593,8 @@ socket.on('connect', function () {
                     else if (texture == "/assets/tiles/WE.png") {
                         socket.emit('place piece', row, col, 'WE');
                     }
+
+                    frozen = true;
                 }
             }
             else if (e.keyCode == '75') {
@@ -489,6 +624,7 @@ socket.on('connect', function () {
         boardContainer.addChild(player1);
         boardContainer.addChild(player2);
         boardContainer.addChild(bombsContainer);
+        boardContainer.addChild(hazeContainer);
         boardContainer.addChild(select);
         boardContainer.addChild(edgeContainer);
 
@@ -498,6 +634,8 @@ socket.on('connect', function () {
         app.stage.addChild(queueContainer);
         app.stage.addChild(boardContainer);
         app.stage.addChild(infobarContainer);
+        app.stage.addChild(p1BarContainer);
+        app.stage.addChild(p2BarContainer);
 
 
 
@@ -505,8 +643,22 @@ socket.on('connect', function () {
             console.log('opp disconnect');
         });
 
+        socket.on('p1', () => {
+            p1p2 = 'p1';
+            select.x = 0;
+            select.y = 0;
+            updateSelect();
+        });
+
         socket.on('board', (myboard, mycarrots, mystones, p1x, p1y, p1dir, p1count, p2x, p2y, p2dir, p2count) => {
-            console.log('board received');
+            if (startTime == 0) {
+                startTime = Date.now();
+                timerInterval = setInterval(setTime, 1000);
+            }
+            if (haze == undefined) {
+                initializeHaze(p1p2);
+            }
+
             for (let row = 0; row < boardHeight; row++) {
                 for (let col = 0; col < boardWidth; col++) {
                     board[row][col].texture = resources['/assets/tiles/' + myboard[row][col] + '.png'].texture;
@@ -541,10 +693,19 @@ socket.on('connect', function () {
             player2X = p2x;
             player2Y = p2y;
             player2Direction = p2dir;
-            carrotCount = p1count;
+            p1CarrotCount = p1count;
+            p2CarrotCount = p2count;
+            carrotText1.text = p1CarrotCount;
+            carrotText2.text = p2CarrotCount;
             setPlayerPosition(player1, player1X, player1Y, player1Direction);
             setPlayerPosition(player2, player2X, player2Y, player2Direction);
+            updateHaze(p1p2);
             updateSelect();
+        });
+
+        socket.on('place success', () => {
+            updateQueue();
+            frozen = false;
         });
 
     }
