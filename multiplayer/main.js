@@ -7,8 +7,8 @@ WebFont.load({
     }
 });
 
-const url = 'http://localhost:5000';
-//const url = 'https://carroteer-backend.herokuapp.com';
+//const url = 'http://localhost:5000';
+const url = 'https://carroteer-backend.herokuapp.com';
 
 const boardWidth = 8;
 const boardHeight = 8;
