@@ -59,8 +59,6 @@ socket.on('connect', function () {
         .add("/assets/tiles/SW.png")
         .add("/assets/tiles/WE.png")
         .add("/assets/tiles/red.png")
-        .add("/assets/tiles/blue.png")
-        .add("/assets/tiles/purple.png")
         .add("/assets/tiles/edge.png")
         .add("/assets/tiles/corner.png")
         .add("/assets/ui/exitpressed.png")
@@ -148,6 +146,7 @@ socket.on('connect', function () {
             }
             bombs.push(rowArr);
         }
+
 
         function addBombs(x, y) {
             for (let row = y - 1; row <= y + 1; row++) {
@@ -601,7 +600,7 @@ socket.on('connect', function () {
                 // k
                 let row = select.y / 80;
                 let col = select.x / 80;
-                addBombs(col, row);
+                socket.emit('place bomb', row, col);
             }
 
         }
@@ -650,7 +649,7 @@ socket.on('connect', function () {
             updateSelect();
         });
 
-        socket.on('board', (myboard, mycarrots, mystones, p1x, p1y, p1dir, p1count, p2x, p2y, p2dir, p2count) => {
+        socket.on('board', (myboard, mycarrots, mystones, mybombs, p1x, p1y, p1dir, p1count, p2x, p2y, p2dir, p2count) => {
             if (startTime == 0) {
                 startTime = Date.now();
                 timerInterval = setInterval(setTime, 1000);
@@ -684,6 +683,17 @@ socket.on('connect', function () {
                         stoneContainer.removeChild(stones[row][col]);
                         stones[row][col] = undefined;
                     }
+
+                    if (mybombs[row][col] && bombs[row][col] == undefined) {
+                        bombs[row][col] = new PIXI.Sprite(resources["/assets/objects/bomb.png"].texture);
+                        bombs[row][col].x = col * 80;
+                        bombs[row][col].y = row * 80;
+                        bombsContainer.addChild(bombs[row][col])
+                    }
+                    else if (!mybombs[row][col] && bombs[row][col] != undefined) {
+                        bombsContainer.removeChild(bombs[row][col]);
+                        bombs[row][col] = undefined;
+                    }
                 }
             }
 
@@ -703,7 +713,7 @@ socket.on('connect', function () {
             updateSelect();
         });
 
-        socket.on('place success', () => {
+        socket.on('place piece success', () => {
             updateQueue();
             frozen = false;
         });
