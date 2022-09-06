@@ -7,14 +7,14 @@ WebFont.load({
     }
 });
 
-//const url = 'http://localhost:5000';
-const url = 'https://carroteer-backend.herokuapp.com';
+const url = 'http://localhost:5000';
+//const url = 'https://carroteer-backend.herokuapp.com';
 
 const boardWidth = 8;
 const boardHeight = 8;
 //const boardX = 200;
 const boardY = 150;
-const boardX = window.innerWidth / 2 - (boardWidth * 80 / 2) - 50;
+const boardX = window.innerWidth / 2 - (boardWidth * 80 / 2);
 
 const queueX = boardX - 120;
 const queueY = 200;
@@ -464,11 +464,11 @@ socket.on('connect', function () {
                         else if (Math.abs(player1X - col) < 2 && Math.abs(player1Y - row) < 2) {
                             makeRed(row, col)
                         }
-                        // their half
-                        else if (row < boardHeight / 2) {
+                        // their side
+                        else if (row < boardHeight / 2 + 2) {
                             makeRed(row, col)
                         }
-                        // your half
+                        // your side
                         else {
                             makeClear(row, col)
                         }
@@ -479,18 +479,18 @@ socket.on('connect', function () {
                             makeRed(row, col)
                         }
                         // you are near tile
-                        else if (Math.abs(player1X - col < 2) && Math.abs(player1Y - row) < 2) {
+                        else if (Math.abs(player1X - col) < 2 && Math.abs(player1Y - row) < 2) {
                             makeClear(row, col)
                         }
                         // they are near tile
                         else if (Math.abs(player2X - col < 2) && Math.abs(player2Y - row) < 2) {
                             makeRed(row, col)
                         }
-                        // their half
-                        else if (row >= boardHeight / 2) {
+                        // their side
+                        else if (row >= boardHeight / 2 - 2) {
                             makeRed(row, col)
                         }
-                        // your half
+                        // your side
                         else {
                             makeClear(row, col)
                         }
@@ -600,7 +600,10 @@ socket.on('connect', function () {
                 // k
                 let row = select.y / 80;
                 let col = select.x / 80;
-                socket.emit('place bomb', row, col);
+
+                if (stones[row][col] == undefined && haze[row][col] == undefined && (row != 0 || col != 0) && (row != boardHeight - 1 || col != boardWidth - 1)) {
+                    socket.emit('place bomb', row, col);
+                }
             }
 
         }
