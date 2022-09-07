@@ -7,8 +7,8 @@ WebFont.load({
     }
 });
 
-//const url = 'http://localhost:5000';
-const url = 'https://carroteer-backend.herokuapp.com';
+const url = 'http://localhost:5000';
+//const url = 'https://carroteer-backend.herokuapp.com';
 
 const boardWidth = 8;
 const boardHeight = 8;
@@ -419,7 +419,6 @@ socket.on('connect', function () {
 
         let haze;
         function initializeHaze(p1p2) {
-            console.log(p1p2);
             haze = [];
             for (let row = 0; row < boardHeight; row++) {
                 let rowArr = [];
@@ -719,6 +718,10 @@ socket.on('connect', function () {
         socket.on('place piece success', () => {
             updateQueue();
             frozen = false;
+        });
+
+        socket.on('starting', () => {
+            console.log('aaa');
         });
 
     }
