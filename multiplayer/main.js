@@ -1,12 +1,6 @@
 //const io = require('socket.io-client');
 import { boardEdges, queueEdges } from './borders.js';
 
-WebFont.load({
-    google: {
-        families: ['DynaPuff']
-    }
-});
-
 //const url = 'http://localhost:5000';
 const url = 'https://carroteer-backend.herokuapp.com';
 

@@ -1,22 +1,57 @@
-body{
+body {
     margin: 0%;
 }
-button{
+
+button {
     width: 50%;
     height: 100vh;
     background-size: 100%;
-    background-color: rgba(0, 0, 0, 0.7); /* Tint color */
+    background-color: rgba(0, 0, 0, 0.7);
+    /* Tint color */
     background-blend-mode: multiply;
     transition-duration: 0.4s;
-    font-size:3vw;
-    font-family: 'Sigmar One'  ;
+    font-size: 3vw;
+    font-family: 'Sigmar One';
 }
-button:hover{
-    background-color: rgba(0,0,0,0.1);
+
+button:hover {
+    background-color: rgba(0, 0, 0, 0.1);
 }
-#left{
+
+#left {
     background-image: url("background.png");
 }
-#right{
+
+#right {
     background-image: url("network.jpg");
+}
+
+/* latin-ext */
+@font-face {
+    font-family: 'Sigmar One';
+    font-style: normal;
+    font-weight: 400;
+    src: url(/assets/fonts/co3DmWZ8kjZuErj9Ta3do6rppkDi.woff2) format('woff2');
+    unicode-range: U+0100-024F, U+0259, U+1E00-1EFF, U+2020, U+20A0-20AB, U+20AD-20CF, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+
+/* latin */
+@font-face {
+    font-family: 'Sigmar One';
+    font-style: normal;
+    font-weight: 400;
+    src: url(/assets/fonts/co3DmWZ8kjZuErj9Ta3do6Tppg.woff2) format('woff2');
+    unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+@font-face {
+    font-family: 'DynaPuff';
+    font-style: normal;
+    font-weight: 400;
+    src: url(/assets/fonts/DynaPuff-Regular.woff2) format('woff2');
+}
+
+#useFont {
+    font-family: 'DynaPuff';
+    font-size: 0px;
 }
