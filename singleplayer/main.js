@@ -81,10 +81,10 @@ function setup() {
                 background.width = app.screen.width;
                 background.height = app.screen.height;
 
-                blackLayer.width = window.innerWidth;
-                blackLayer.height = window.innerHeight;
+                blackLayer.width = app.screen.width;
+                blackLayer.height = app.screen.height;
 
-                boardContainer.x = window.innerWidth / 2 - (boardWidth * 80 / 2);
+                boardContainer.x = app.screen.width / 2 - (boardWidth * 80 / 2);
                 infobarContainer.x = boardContainer.x;
                 queueContainer.x = boardContainer.x - 120;
 
