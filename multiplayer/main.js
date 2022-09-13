@@ -1,8 +1,8 @@
 //const io = require('socket.io-client');
 import { boardEdges, queueEdges } from './borders.js';
 
-const url = 'http://localhost:5000';
-//const url = 'https://carroteer-backend.herokuapp.com';
+//const url = 'http://localhost:5000';
+const url = 'https://carroteer-backend.herokuapp.com';
 
 const boardWidth = 8;
 const boardHeight = 8;
@@ -531,7 +531,7 @@ socket.on('connect', function () {
         blackLayer.width = window.innerWidth;
         blackLayer.height = window.innerHeight;
 
-        
+
         let waitingContainer = new PIXI.Container();
 
         let outerBox = new PIXI.Sprite(resources['/assets/scene/winbackground.jpg'].texture);
