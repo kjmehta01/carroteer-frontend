@@ -86,11 +86,17 @@ socket.on('connect', function () {
                     background.width = app.screen.width;
                     background.height = app.screen.height;
 
-                    boardContainer.x = window.innerWidth / 2 - (boardWidth * 80 / 2);
+                    boardContainer.x = app.screen.width / 2 - (boardWidth * 80 / 2);
 
                     infobarContainer.x = boardContainer.x;
 
                     queueContainer.x = boardContainer.x - 120;
+
+                    blackLayer.width = app.screen.width;
+                    blackLayer.height = app.screen.height;
+
+                    waitingContainer.x = app.screen.width / 2 - waitingContainer.width / 2;
+                    waitingContainer.y = app.screen.height / 2 - waitingContainer.height / 2;
 
                     p1BarContainer.x = boardContainer.x + 80 * boardWidth + 25;
                     p2BarContainer.x = boardContainer.x + 80 * boardWidth + 25;
@@ -515,6 +521,33 @@ socket.on('connect', function () {
 
 
 
+        // WAITING SCREEN
+        let blackLayer = new PIXI.Container();
+
+        let blackSprite = new PIXI.Sprite(resources['/assets/scene/black.jpg'].texture);
+        blackSprite.alpha = 0.8;
+
+        blackLayer.addChild(blackSprite);
+        blackLayer.width = window.innerWidth;
+        blackLayer.height = window.innerHeight;
+
+
+        let waitingContainer = new PIXI.Container();
+
+        let outerBox = new PIXI.Sprite(resources['/assets/scene/winbackground.jpg'].texture);
+        outerBox.width = 700;
+        outerBox.height = 300;
+        waitingContainer.addChild(outerBox);
+        waitingContainer.x = window.innerWidth / 2 - waitingContainer.width / 2;
+        waitingContainer.y = window.innerHeight / 2 - waitingContainer.height / 2;
+
+        let waitingText = new PIXI.Text("Waiting...", { fontFamily: 'DynaPuff', fontSize: 72, fill: 0x000000, align: 'right' });
+        waitingText.x = waitingContainer.width / 2 - waitingText.width / 2;
+        waitingText.y = waitingContainer.height / 2 - waitingText.height / 2;
+        waitingContainer.addChild(waitingText);
+
+
+
 
         /*
         *
@@ -631,6 +664,8 @@ socket.on('connect', function () {
         app.stage.addChild(infobarContainer);
         app.stage.addChild(p1BarContainer);
         app.stage.addChild(p2BarContainer);
+        app.stage.addChild(blackLayer);
+        app.stage.addChild(waitingContainer);
 
 
 
@@ -649,9 +684,9 @@ socket.on('connect', function () {
             if (startTime == 0) {
                 startTime = Date.now();
                 timerInterval = setInterval(setTime, 1000);
-            }
-            if (haze == undefined) {
                 initializeHaze(p1p2);
+                app.stage.removeChild(blackLayer);
+                app.stage.removeChild(waitingContainer);
             }
 
             for (let row = 0; row < boardHeight; row++) {
@@ -715,7 +750,20 @@ socket.on('connect', function () {
         });
 
         socket.on('starting', () => {
-            console.log('aaa');
+            waitingText.text = 'Starting in 5';
+            waitingText.x = waitingContainer.width / 2 - waitingText.width / 2;
+            waitingText.y = waitingContainer.height / 2 - waitingText.height / 2;
+
+            setTimeout(decrement, 1000);
+            function decrement() {
+                let dec = parseInt(waitingText.text.charAt(waitingText.text.length - 1)) - 1;
+                if (dec >= 0) {
+                    waitingText.text = 'Starting in ' + dec;
+                    waitingText.x = waitingContainer.width / 2 - waitingText.width / 2;
+                    waitingText.y = waitingContainer.height / 2 - waitingText.height / 2;
+                    setTimeout(decrement, 1000);
+                }
+            }
         });
 
     }
