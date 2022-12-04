@@ -1,8 +1,8 @@
 //const io = require('socket.io-client');
 import { boardEdges, queueEdges } from './borders.js';
 
-//const url = 'http://localhost:5000';
-const url = 'https://carroteer-backend.herokuapp.com';
+const url = 'http://localhost:5000';
+//const url = 'https://carroteer-backend.herokuapp.com';
 
 const boardWidth = 8;
 const boardHeight = 8;
@@ -457,8 +457,8 @@ socket.on('connect', function () {
                         else if (Math.abs(player1X - col) < 2 && Math.abs(player1Y - row) < 2) {
                             makeRed(row, col)
                         }
-                        // their side
-                        else if (row < boardHeight / 2 + 2) {
+                        // their corner
+                        else if (row < boardHeight / 2 && col < boardWidth / 2) {
                             makeRed(row, col)
                         }
                         // your side
@@ -480,7 +480,7 @@ socket.on('connect', function () {
                             makeRed(row, col)
                         }
                         // their side
-                        else if (row >= boardHeight / 2 - 2) {
+                        else if (row >= boardHeight / 2 && col >= boardWidth / 2) {
                             makeRed(row, col)
                         }
                         // your side
@@ -594,7 +594,7 @@ socket.on('connect', function () {
                 let row = select.y / 80;
                 let col = select.x / 80;
 
-                if (stones[row][col] == undefined && haze[row][col] == undefined && (row != 0 || col != 0) && (row != boardHeight - 1 || col != boardWidth - 1)) {
+                if (stones[row][col] == undefined && haze[row][col] == undefined) {
                     socket.emit('place bomb', row, col);
                 }
             }
